@@ -1,7 +1,7 @@
 /*
  * FileBrowser.java
  *
- * Version mise à jour le 21 Décembre 2014
+ * Version mise Ã  jour le 21 DÃ©cembre 2014
  * 
  * @author Maithili Vinayagamoorthi
  * @version 1.1
@@ -20,9 +20,9 @@ import javax.swing.JFrame;
 /**
  * FileBrowser
  * 
- * Dans la classe FileBrowser on créé une fenetre
+ * Dans la classe FileBrowser on crÃ©Ã© une fenetre
  * et on y ajoute l'explorateur de fichiers et 
- * les deux boutons "Signature" et "Vérification".
+ * les deux boutons "Signature" et "VÃ©rification".
  */
 @SuppressWarnings("serial")
 public class FileBrowser extends JFrame {
@@ -37,7 +37,7 @@ public class FileBrowser extends JFrame {
 		
 		// Mise en place de l'explorateur de fichiers
 		jFilePicker filePicker = new jFilePicker("Fichier", "Parcourir...");
-		filePicker.setMode(jFilePicker.MODE_SAVE);
+		filePicker.setMode(jFilePicker.MODE_OPEN);
 		filePicker.addFileTypeFilter(".txt", "Text File");
 		filePicker.addFileTypeFilter(".doc", "Document File");
 		filePicker.addFileTypeFilter(".docx", "XML Format Document File");
@@ -47,7 +47,7 @@ public class FileBrowser extends JFrame {
 		JFileChooser fileChooser = filePicker.getFileChooser();
 		fileChooser.setCurrentDirectory(new File("D:/"));
 		
-		// Ajouter le composant explorateur de fichiers à la fenetre
+		// Ajouter le composant explorateur de fichiers Ã  la fenetre
 		add(filePicker);
 		Container contentPane = getContentPane();
 		contentPane.add(new ButtonPanel());
