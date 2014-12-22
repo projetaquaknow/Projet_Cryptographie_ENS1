@@ -1,7 +1,7 @@
 /*
  * Gui.java
  * 
- * Verson mise à jour le 21 Décembre 2014
+ * Verson mise Ã  jour le 21 DÃ©cembre 2014
  * 
  * @author David Carmona-Moreno
  * @version 1.1
@@ -15,10 +15,10 @@ import javax.swing.SwingUtilities;
  * Gui
  * 
  * Dans la classe Gui on intancie tous 
- * les objets nécessaires à l'affichage
+ * les objets nÃ©cessaires Ã  l'affichage
  * d'une interface graphique. 
  * Une fenetre, un explorateur de fichiers,
- * les boutons "Signature" et "Vérification" 
+ * les boutons "Signature" et "VÃ©rification" 
  * et une autre fenetre affichant le DN et
  * le nom du fichier
  */
@@ -27,6 +27,9 @@ public class Gui {
 	public static void main(String[] args) {
 		
 		Verification verif = new Verification();
+		SignatureGUI mygui=new SignatureGUI();
+		
+		mygui.getSignatureGUI();
 		SwingUtilities.invokeLater(new Runnable() {
 	         @Override
 	         public void run() {
