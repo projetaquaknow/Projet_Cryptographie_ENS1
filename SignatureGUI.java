@@ -1,4 +1,14 @@
-package gui;
+/*
+ * SignatureGUI.java
+ *
+ * Version mise à jour le 22 Décembre 2014
+ * 
+ * @author Cathie Prigent
+ * @version 1.1
+ */
+
+
+package GUI;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -8,8 +18,24 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+/**
+ * SignatureGUI
+ * 
+ * La classe SignatureGUI permet d'afficher
+ * une fenetre qui montre le nom du fichier,
+ * d'entrer le nom du signataire, le
+ * prénom du signataire, le mot
+ * de passe secondaire et un bouton "Signer".
+ * 
+ */
 public class SignatureGUI {
 	
+	/**
+	  * Affiche la fenetre décrite 
+	  * précédemment
+	  * 
+	  * @author         Cathie Prigent
+	  */
 	public static void getSignatureGUI() {
 		JFrame frame = new JFrame("Signature");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,10 +59,6 @@ public class SignatureGUI {
 	    
 	    frame.pack();
 	    frame.setVisible(true);
-	}
-	
-	public static void main(String[] args) {
-		getSignatureGUI();
 	}
 	
 }
