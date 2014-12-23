@@ -47,10 +47,10 @@ public class SignatureGUI {
 	    contentPane.add(new JLabel("Appropriate_FileName"));
 	    
 	    contentPane.add(new JLabel("Nom du signataire : "));
-	    contentPane.add(new JLabel("Nom"));
+	    contentPane.add(new JTextField(25));
 	    
 	    contentPane.add(new JLabel("Prénom du signataire : "));
-	    contentPane.add(new JLabel("Prénom"));
+	    contentPane.add(new JTextField(25));
 	    
 	    contentPane.add(new JLabel("Mot de passe : "));
 	    contentPane.add(new JTextField(25));
