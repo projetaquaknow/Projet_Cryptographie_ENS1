@@ -1,4 +1,6 @@
-package keystore;
+
+
+package keyStore;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -7,37 +9,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Key;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAParams;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.security.auth.x500.X500Principal;
-import java.security.Key;
-
 
 /**
  * Classe permettant la manipulation
- * aisÃ©e des Keystore.
+ * aisée des Keystore.
  * @author Maithili Vinayagamoorthi
  * @author Cathie Prigent
  * @author David Carmona-Moreno
@@ -64,34 +49,33 @@ public class Kstore{
           InputStream is = new BufferedInputStream(new FileInputStream(new File("kstore.ks")));
           kstore.load(is,passwd);
           
-          // Il faut garder le mot de passe du keystore pour l'utiliser par dÃ©faut
-          // lorsque l'utilisateur de la classe ne prÃ©cise pas de mot de passe
-          // pour insÃ©rer une nouvelle entrÃ©e dans le keystore de l'instance
-          // (la seule mÃ©thode concernÃ©e est importSecretKey)
+          // Il faut garder le mot de passe du keystore pour l'utiliser par défaut
+          // lorsque l'utilisateur de la classe ne précise pas de mot de passe
+          // pour insérer une nouvelle entrée dans le keystore de l'instance
+          // (la seule méthode concernée est importSecretKey)
           kstorepwd = passwd;
      }
      
      /**
-      * Sauvegarde l'Ã©tat courant du keystore manipulÃ© dans le fichier file en le
-      * protÃ©geant avec le mot de passe passwd.
+      * Sauvegarde l'état courant du keystore manipulé dans le fichier file en le
+      * protégeant avec le mot de passe passwd.
       * @param file Le fichier dans lequel sauvegarder le keystore de l'instance.
-      * @param passwd Le mot de passe protÃ©geant le fichier crÃ©Ã©.
+      * @param passwd Le mot de passe protégeant le fichier créé.
       */
      public void save(File file, char[] passwd)
              throws GeneralSecurityException, IOException {
     	 
-         // SÃ©rialise le contenu du keystore dans le flot attachÃ© au fichier file
+         // Sérialise le contenu du keystore dans le flot attaché au fichier file
          try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
              kstore.store(os, passwd);
          }
      }
      
      /**
-      * Sauvegarde l'Ã©tat courant du keystore manipulÃ© dans le fichier file en le
-      * protÃ©geant avec le mot de passe passwd.
-      * @param alias L'alias de l'entrÃ©e du Keystore.
-      * @param keypwd Le mot de passe protÃ©geant de l'entrÃ©e.
-      * @return key  Renvoi la clÃ© privÃ©e associÃ©e Ã  l'alias.
+      * Retourne la clé associée à l'alias indiqué
+      * en utilisant le mot de passe passwd
+      * @param alias L'alias de l'entrée du Keystore.
+      * @param keypwd Le mot de passe pour récupérer la clé
       */
      private Key getKey(String alias, char[] keypwd) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
     	 
@@ -99,7 +83,18 @@ public class Kstore{
      }
      
      /**
-      * DÃ©monstration de la classe.
+      * Importe dans le keystore le certificat cert sous le nom alias.
+      * @param cert Le certificat à insérer.
+      * @param alias L'alias à associer avec le certificat inséré.
+      */
+     public void importCertificate(Certificate cert, String alias)
+             throws GeneralSecurityException {
+         // Insère le certificat dans le keystore
+         kstore.setCertificateEntry(alias, cert);
+     }
+     
+     /**
+      * Démonstration de la classe.
       * @param args
       */
      public static void main(String[] args) throws GeneralSecurityException{
@@ -115,4 +110,3 @@ public class Kstore{
     		
      }
 }
-
