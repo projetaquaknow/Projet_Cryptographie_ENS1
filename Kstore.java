@@ -22,7 +22,7 @@ import java.security.cert.CertificateFactory;
 
 /**
  * Classe permettant la manipulation
- * aisée des Keystore.
+ * aisï¿½e des Keystore.
  * @author Maithili Vinayagamoorthi
  * @author Cathie Prigent
  * @author David Carmona-Moreno
@@ -49,33 +49,35 @@ public class Kstore{
           InputStream is = new BufferedInputStream(new FileInputStream(new File("kstore.ks")));
           kstore.load(is,passwd);
           
-          // Il faut garder le mot de passe du keystore pour l'utiliser par défaut
-          // lorsque l'utilisateur de la classe ne précise pas de mot de passe
-          // pour insérer une nouvelle entrée dans le keystore de l'instance
-          // (la seule méthode concernée est importSecretKey)
+          // Il faut garder le mot de passe du keystore pour l'utiliser par dï¿½faut
+          // lorsque l'utilisateur de la classe ne prï¿½cise pas de mot de passe
+          // pour insï¿½rer une nouvelle entrï¿½e dans le keystore de l'instance
+          // (la seule mï¿½thode concernï¿½e est importSecretKey)
           kstorepwd = passwd;
      }
      
      /**
-      * Sauvegarde l'état courant du keystore manipulé dans le fichier file en le
-      * protégeant avec le mot de passe passwd.
+      * Sauvegarde l'ï¿½tat courant du keystore manipulï¿½ dans le fichier file en le
+      * protï¿½geant avec le mot de passe passwd.
       * @param file Le fichier dans lequel sauvegarder le keystore de l'instance.
-      * @param passwd Le mot de passe protégeant le fichier créé.
+      * @param passwd Le mot de passe protï¿½geant le fichier crï¿½ï¿½.
+     * @throws java.security.GeneralSecurityException
+     * @throws java.io.IOException
       */
      public void save(File file, char[] passwd)
              throws GeneralSecurityException, IOException {
     	 
-         // Sérialise le contenu du keystore dans le flot attaché au fichier file
+         // Sï¿½rialise le contenu du keystore dans le flot attachï¿½ au fichier file
          try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
              kstore.store(os, passwd);
          }
      }
      
      /**
-      * Retourne la clé associée à l'alias indiqué
+      * Retourne la clï¿½ associï¿½e ï¿½ l'alias indiquï¿½
       * en utilisant le mot de passe passwd
-      * @param alias L'alias de l'entrée du Keystore.
-      * @param keypwd Le mot de passe pour récupérer la clé
+      * @param alias L'alias de l'entrï¿½e du Keystore.
+      * @param keypwd Le mot de passe pour rï¿½cupï¿½rer la clï¿½
       */
      private Key getKey(String alias, char[] keypwd) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
     	 
@@ -83,19 +85,45 @@ public class Kstore{
      }
      
      /**
-      * Importe dans le keystore le certificat cert sous le nom alias.
-      * @param cert Le certificat à insérer.
-      * @param alias L'alias à associer avec le certificat inséré.
+      * Associe une entrÃ©e du keystore a l'alias passÃ© en paramÃ¨tre
+      * @param alias L'alias qui sera associÃ© Ã  l'entrÃ©e
+      * @param entry L'entrÃ©e Ã  insÃ©rer dans le keystore
+      * @param protParam Un paramÃ¨tre qui peut permettre de vÃ©rifier l'intÃ©gritÃ© de l'entrÃ©e
+      * @throws java.security.KeyStoreException 
       */
-     public void importCertificate(Certificate cert, String alias)
-             throws GeneralSecurityException {
-         // Insère le certificat dans le keystore
+     public void setEntry (String alias, KeyStore.Entry entry, KeyStore.ProtectionParameter protParam) throws KeyStoreException {
+         kstore.setEntry(alias, entry, protParam);
+     }
+     
+     /**
+      * Associe le certificat Ã  l'alias passÃ© en paramÃ¨tre
+      * @param alias L'alias qui sera associÃ© au certificat
+      * @param cert Le certificat Ã  insÃ©rer dans le keystore
+      * @throws KeyStoreException 
+      */
+     
+     public void setCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
          kstore.setCertificateEntry(alias, cert);
      }
      
      /**
-      * Démonstration de la classe.
+      * Importe dans le keystore le certificat cert sous le nom alias.
+      * @param cert Le certificat ï¿½ insï¿½rer.
+      * @param alias L'alias ï¿½ associer avec le certificat insï¿½rï¿½.
+      * @throws java.security.GeneralSecurityException
+      */
+     public void importCertificate(Certificate cert, String alias)
+             throws GeneralSecurityException {
+         // Insï¿½re le certificat dans le keystore
+         kstore.setCertificateEntry(alias, cert);
+     }
+     
+     
+     
+     /**
+      * Dï¿½monstration de la classe.
       * @param args
+      * @throws java.security.GeneralSecurityException
       */
      public static void main(String[] args) throws GeneralSecurityException{
     	 

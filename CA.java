@@ -278,7 +278,7 @@ public class CA {
     /**
     * Exportation du certificat du CA en DER encodé Base64
     * @param file le fichier où exporter le certificat
-    * @param le certificat à exporter
+    * @param cert le certificat à exporter
     * @throws GeneralSecurityException si l'encodage DER échoue
     * @throws IOException si l'exportation échoue
     */
@@ -294,7 +294,7 @@ public class CA {
     /**
     * Exportation du certificat du CA en DER encodé base64
     * @param fileName le nom du fichier où exporter le certificat
-    * @param le certificat à exporter
+    * @param cert le certificat à exporter
     * @throws GeneralSecurityException si l'encodage DER échoue
     * @throws IOException si l'exportation échoue
     */
@@ -303,7 +303,10 @@ public class CA {
                 exportCertificate(new File(fileName), cert);
     }
          
-    
+    /**
+     * Génère les clés publiques, privées, le certificat associé et les insère dans le keystore
+     * @param args 
+     */
     public static void main(String[] args){
      try {
             // Pour pouvoir utiliser l'API BouncyCastle au travers du mécanisme standard du JCE
