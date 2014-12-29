@@ -6,12 +6,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
@@ -34,6 +38,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.asn1.x500.X500Name;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Map;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.cert.X509ExtensionUtils;
@@ -60,7 +67,7 @@ public class CA {
     private static final String DN = "CN=RootCA OU=M2 O=miage C=FR";
     
     // Le DN du sujet
-    private static final String SDN= "CN=RootCA OU=M2 O=miage C=FR";
+    private static final String SDN= "CN=Cathie Prigent OU=ENSISA O=UHA C=FR";
     
     // L'alias permettant la récupération du certificat autosigné du CA
     private static final String ALIAS = "miageCA";
@@ -154,8 +161,8 @@ public class CA {
         
         // le numéro de série de ce certificat
         // certGen.setSerialNumber(BigInteger.ONE);
-        //SecureRandom random = SecureRandom.getInstance("SHA1_WITH_RSA_OID");
-        //BigInteger serialNumber = BigInteger.valueOf(Math.abs(random.nextInt()));
+        // SecureRandom random = SecureRandom.getInstance("SHA1_WITH_RSA_OID");
+        // BigInteger serialNumber = BigInteger.valueOf(Math.abs(random.nextInt()));
         
         // le nom de l'émetteur 
         X500Name caDn = new X500Name(DN);
@@ -213,14 +220,97 @@ public class CA {
         OutputStream out = new BufferedOutputStream(new FileOutputStream(caDir));
         ks.store(out, passwd);
           
+    }
+    
+    /**
+     * Classe interne qui permet de générer le Keystore
+     * @author David Carmona-Moreno
+     * @author Cathie Prigent
+     * @author Maithili Vinayagamoorthi
+     */
+    public static class KStore {
+        
+        // Le keystore de l'instance	
+        private KeyStore kstore;
+   
+        // Mot de passe du Keystore
+        private char[] kstorepwd;
+     
+        private static final Map<String, String> OID_MAP = new HashMap<>();
+        static {
+            OID_MAP.put("1.2.840.113549.1.9.1", "emailAddress");
+            OID_MAP.put("1.2.840.113549.1.9.2", "unstructuredName");
+            OID_MAP.put("1.2.840.113549.1.9.8", "unstructuredAddress");
+            OID_MAP.put("1.2.840.113549.1.9.16", "S/MIME Object Identifier Registry");
         }
+     
+        /**
+         * Constructeur de la classe Kstore
+         * @param algoType    Le type du Keystore
+         * @param passwd      Le mot de passe du Keystore
+         */
+        private KStore(String algoType,char[] passwd) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+    	  
+    	    // Construction d'une instance d'un keystore de type type
+            kstore = KeyStore.getInstance(algoType);
+          
+            // Initialisation du keystore avec le contenu du fichier file
+            InputStream is = new BufferedInputStream(new FileInputStream(new File("kstore.ks")));
+            kstore.load(is,passwd);
+          
+            // Il faut garder le mot de passe du keystore pour l'utiliser par défaut
+            // lorsque l'utilisateur de la classe ne précise pas de mot de passe
+            // pour insérer une nouvelle entrée dans le keystore de l'instance
+            // (la seule méthode concernée est importSecretKey)
+            kstorepwd = passwd;
+        }
+     
+        /**
+         * Sauvegarde l'état courant du keystore manipulé dans le fichier file en le
+         * protégeant avec le mot de passe passwd.
+         * @param file Le fichier dans lequel sauvegarder le keystore de l'instance.
+         * @param passwd Le mot de passe protégeant le fichier créé.
+         */
+        public void save(String file, char[] passwd)
+            throws GeneralSecurityException, IOException {
+    	 
+            // Sérialise le contenu du keystore dans le flot attaché au fichier file
+            try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+            kstore.store(os, passwd);
+            }
+        
+        }
+        
+        /**
+         * Méthode qui permet d'ajouter une entrée au Keystore généré
+         * @arg alias L'alias 
+         * @arg entry Le type de l'entrée qu'on veut insérer
+         * @arg protParam le paramètre de protection de l'entrée
+         */
+        public void enterpk(String alias,KeyStore.Entry entry,KeyStore.ProtectionParameter protParam)
+                throws KeyStoreException
+        {
+            kstore.setEntry(alias, entry, protParam);
+        }
+        
+        /**
+         * Méthode qui permet d'ajouter une entrée de type CertificateEntry dans le Keystore généré
+         * @param alias L'alias 
+         * @param cert  Le certificat 
+         * @throws KeyStoreException 
+         */
+        public void entercert(String alias,Certificate cert)throws KeyStoreException{
+            kstore.setCertificateEntry(alias, cert);
+        }
+        
+    }
     
     /**
     * Génération d'un certificat pour l'identification d'un serveur
     * @param dn le nom distingué du serveur
     * @param altName le nom alternatif du serveur
     * @param pk la clé publique devant être enrobée dans le certificat
-    * @return un certificat (norme X509 v3) qui empaquetant la clé publique pk
+    * @return un certificat (norme X509 v3)empaquetant la clé publique pk
     * @throws GeneralSecurityException si la fabrication du certificat échoue
     * @throws IOException si la fabrication du numéro de série échoue 
     */
@@ -278,7 +368,7 @@ public class CA {
     /**
     * Exportation du certificat du CA en DER encodé Base64
     * @param file le fichier où exporter le certificat
-    * @param cert le certificat à exporter
+    * @param cert Le certificat à exporter
     * @throws GeneralSecurityException si l'encodage DER échoue
     * @throws IOException si l'exportation échoue
     */
@@ -294,7 +384,7 @@ public class CA {
     /**
     * Exportation du certificat du CA en DER encodé base64
     * @param fileName le nom du fichier où exporter le certificat
-    * @param cert le certificat à exporter
+    * @param le certificat à exporter
     * @throws GeneralSecurityException si l'encodage DER échoue
     * @throws IOException si l'exportation échoue
     */
@@ -303,29 +393,35 @@ public class CA {
                 exportCertificate(new File(fileName), cert);
     }
          
-    /**
-     * Génère les clés publiques, privées, le certificat associé et les insère dans le keystore
-     * @param args 
-     */
-    public static void main(String[] args){
-     try {
+    
+    public static void main(String[] args) throws KeyStoreException{
+      
+        try {
             // Pour pouvoir utiliser l'API BouncyCastle au travers du mécanisme standard du JCE
             Security.addProvider(new BouncyCastleProvider());
             
             // Instanciation d'une CA depuis un fichier keystore, s'il existe
             CA ca = new CA("x4TRDf4JHY578pth".toCharArray());
+            //CA ca = new CA("azerty".toCharArray());
+            
+            // Instanciation du Keystore ave tous les DN des utilisateurs
+            KStore mystore=new KStore("JCEKS","azerty".toCharArray());
             
             // Génération d'une paire de clés pour un certificat serveur
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(2048);
             KeyPair caKp = kpg.generateKeyPair();
             
-            // Génération du certificat serveur
-            PublicKey pk = caKp.getPublic();
+            // Récupération de la clé privée
+            PrivateKey priv= caKp.getPrivate();
+            
+            // Récupération de la clé publique
+            PublicKey pub=caKp.getPublic();
+            
             X509Certificate srvCert = ca.generateServerCertificate(
-                    "CN=secure.entreprise.fr, OU=FST, O=UHA, L=Mulhouse, ST=68093, C=FR",
-                    "secure.entreprise.com",
-                    pk);
+                    "CN=Cathie Prigent, OU=ENSISA, O=UHA, L=BRUNSTATT, ST=68350, C=FR",
+                    "Cathie Prigent",
+                    pub);
             
             // Exportation du certificat du serveur
             CA.exportCertificate("srv.cer", srvCert);
@@ -343,15 +439,25 @@ public class CA {
                 out.write(encoded);
             }
             
+            // Générer une instance de PrivateKeyEntry contenant la clé privée
+            PrivateKeyEntry priventry=new PrivateKeyEntry(priv,new Certificate[]{srvCert});
+            
+            // La clé privée est associée à un alias et est protégée par un mot de passe
+	    mystore.enterpk("key1", priventry, new KeyStore.PasswordProtection("qwerty".toCharArray()));
+            
+            // On associe un certificat à l'alias
+            mystore.entercert("key2", srvCert);
+            
+            //Sauver le Keystore
+            mystore.save("kstore.ks","azerty".toCharArray());
+            
             /* Vérification de ce chemin de certification en utilisant caCert
             PKIXValidator pkiV = new PKIXValidator(new String[]{"ca.cer"});
             pk = pkiV.validate("srv.p7b", "PKCS7");*/
             
             // Affichage de la clé publique du serveur
-            System.out.println(pk);
-        } catch (GeneralSecurityException | IOException ex) {
-            Logger.getLogger(CA.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (OperatorCreationException ex) {
+            System.out.println(pub);
+        } catch (GeneralSecurityException | IOException | OperatorCreationException ex) {
             Logger.getLogger(CA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
