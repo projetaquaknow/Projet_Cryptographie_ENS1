@@ -64,16 +64,16 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 public class CA {
      
     // Le DN du CA
-    private static final String DN = "CN=RootCA OU=M2 O=miage C=FR";
-    
+    private static final String DN = "CN=RootCA, OU=M2, O=miage, C=FR";
+    //private static final String DN = "CN=David Carmona, OU=ENSISA, O=UHA, C=FR";
     // Le DN du sujet
-    private static final String SDN= "CN=Cathie Prigent OU=ENSISA O=UHA C=FR";
-    
+    private static final String SDN= "CN=RootCA, OU=M2, O=miage, C=FR";
+      
     // L'alias permettant la récupération du certificat autosigné du CA
     private static final String ALIAS = "miageCA";
     
     // Le chemin du fichier contenant le keystore du CA
-    private static final String CA_KS_FILE = "ksca.ks";
+    private static final String CA_KS_FILE = "ksta.ks";
     
     // L'OID de l'algorithme SHA-1
     private static final String SHA1_OID = "1.3.14.3.2.26";
@@ -153,7 +153,7 @@ public class CA {
     private void installCA(KeyStore ks, char[] passwd, File caDir)
         throws GeneralSecurityException, IOException, OperatorCreationException {
         
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA");
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(2048);
         KeyPair caKp = kpg.generateKeyPair();
         this.caPk = caKp.getPrivate();
@@ -168,7 +168,7 @@ public class CA {
         X500Name caDn = new X500Name(DN);
         
         // Le nom du sujet
-        X500Name subjdn=new X500Name(SDN);
+        X500Name subjdn=new X500Name(DN);
         
         // Instance d'un calendrier
         Calendar calendar = Calendar.getInstance();
@@ -283,9 +283,9 @@ public class CA {
         
         /**
          * Méthode qui permet d'ajouter une entrée au Keystore généré
-         * @arg alias L'alias 
-         * @arg entry Le type de l'entrée qu'on veut insérer
-         * @arg protParam le paramètre de protection de l'entrée
+         * @param alias
+         * @param entry
+         * @param protParam 
          */
         public void enterpk(String alias,KeyStore.Entry entry,KeyStore.ProtectionParameter protParam)
                 throws KeyStoreException
@@ -419,8 +419,8 @@ public class CA {
             PublicKey pub=caKp.getPublic();
             
             X509Certificate srvCert = ca.generateServerCertificate(
-                    "CN=Cathie Prigent, OU=ENSISA, O=UHA, L=BRUNSTATT, ST=68350, C=FR",
-                    "Cathie Prigent",
+                    "CN=secure.entreprise.fr, OU=FST, O=UHA, L=Mulhouse, ST=68093, C=FR",
+                    "secure.entreprise.com",
                     pub);
             
             // Exportation du certificat du serveur
@@ -443,10 +443,10 @@ public class CA {
             PrivateKeyEntry priventry=new PrivateKeyEntry(priv,new Certificate[]{srvCert});
             
             // La clé privée est associée à un alias et est protégée par un mot de passe
-	    mystore.enterpk("key1", priventry, new KeyStore.PasswordProtection("qwerty".toCharArray()));
+	    mystore.enterpk("key3", priventry, new KeyStore.PasswordProtection("prigent".toCharArray()));
             
             // On associe un certificat à l'alias
-            mystore.entercert("key2", srvCert);
+            mystore.entercert("key4", srvCert);
             
             //Sauver le Keystore
             mystore.save("kstore.ks","azerty".toCharArray());
