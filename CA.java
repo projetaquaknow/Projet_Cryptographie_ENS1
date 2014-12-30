@@ -443,10 +443,10 @@ public class CA {
             PrivateKeyEntry priventry=new PrivateKeyEntry(priv,new Certificate[]{srvCert});
             
             // La clé privée est associée à un alias et est protégée par un mot de passe
-	    mystore.enterpk("key3", priventry, new KeyStore.PasswordProtection("prigent".toCharArray()));
+	    mystore.enterpk("key1", priventry, new KeyStore.PasswordProtection("qwerty".toCharArray()));
             
             // On associe un certificat à l'alias
-            mystore.entercert("key4", srvCert);
+            mystore.entercert("key2", srvCert);
             
             //Sauver le Keystore
             mystore.save("kstore.ks","azerty".toCharArray());
