@@ -1,7 +1,7 @@
 /*
  * ButtonPanel.java
  * 
- * Verson mise à jour le 21 Décembre 2014
+ * Verson mise ï¿½ jour le 21 Dï¿½cembre 2014
  * 
  * @author Maithili Vinayagamoorthi
  * @version 1.1
@@ -17,8 +17,8 @@ import javax.swing.*;
 /**
  * ButtonPanel
  * 
- * Dans la classe ButtonPanel on implémente 
- * les boutons "Signature" et "Vérification".
+ * Dans la classe ButtonPanel on implï¿½mente 
+ * les boutons "Signature" et "Vï¿½rification".
  */
 @SuppressWarnings("serial")
 class ButtonPanel extends JPanel implements ActionListener{
@@ -38,7 +38,7 @@ class ButtonPanel extends JPanel implements ActionListener{
 	    add(BoutonSignature);
 	    add(BoutonVerification);
 	    
-	    // Les sources d'événements sont déclarées à l'écouteur
+	    // Les sources d'ï¿½vï¿½nements sont dï¿½clarï¿½es ï¿½ l'ï¿½couteur
 	    BoutonSignature.addActionListener(this);
 	    BoutonVerification.addActionListener(this);
 	}
@@ -46,14 +46,14 @@ class ButtonPanel extends JPanel implements ActionListener{
 	/**
 	 * Si on clique sur le bouton "Signature",
 	 * la couleur de fond du panneau contenant
-	 * les boutons "Signature" et "Vérification"
+	 * les boutons "Signature" et "Vï¿½rification"
 	 * devient bleu.
-	 * Si on clique sur le bouton "Vérification",
+	 * Si on clique sur le bouton "Vï¿½rification",
 	 * la couleur de fond du panneau contenant
-	 * les boutons "Signature" et "Vérification" 
+	 * les boutons "Signature" et "Vï¿½rification" 
 	 * devient rouge.
 	 * 
-	 * @param evt     Lecture de l'événement souris
+	 * @param evt     Lecture de l'ï¿½vï¿½nement souris
 	 * @author        Maithili Vinayagamoorthi
 	 * @version       1.1
 	 * 
@@ -66,6 +66,16 @@ class ButtonPanel extends JPanel implements ActionListener{
 	    else if (source == BoutonVerification) color = Color.red;
 	    setBackground(color);
 	    repaint();
+            
+            if(source==BoutonSignature){
+               SignatureGUI signaturegui=new SignatureGUI();
+	       signaturegui.getSignatureGUI();
+            }
+            
+            if(source==BoutonVerification){
+               Verification verif = new Verification();
+            }
 	}
 
 }
+
