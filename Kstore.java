@@ -57,15 +57,6 @@ public class Kstore{
      }
      
      /**
-      * Vérifie si le mot de passe soumis au keystore est le bon
-      * @param pwd Le mot de passe que l'on soumet au keystore
-      * @return True si les mots de passe correspondent, False sinon
-      */
-     public boolean verifyPsw(char [] pwd) {
-         return kstorepwd==pwd;
-     }
-     
-     /**
       * Sauvegarde l'�tat courant du keystore manipul� dans le fichier file en le
       * prot�geant avec le mot de passe passwd.
       * @param file Le fichier dans lequel sauvegarder le keystore de l'instance.
