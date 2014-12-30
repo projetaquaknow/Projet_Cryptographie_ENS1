@@ -21,15 +21,6 @@ public class Verification {
     Kstore mystore;
     
     /**
-     * Vérifie si le mot de passe entré est le bon.
-     * @param pwd Le mot de passe saisi
-     * @return Vrai si le mot de passe est le bon, faux sinon
-     */
-    public boolean isPwdCorrect(char[] pwd) {
-        return mystore.verifyPsw(pwd);
-    }
-    
-    /**
      * Fais récupérer la clé privée au keystore
      * @param alias Le nom sous lequel est stocké la clé privée
      * @param keypwd Le mot de passe protégeant la clé privée
@@ -46,12 +37,12 @@ public class Verification {
         }
     }
     
+    
     /*
     Travail restant :
     -Récupération de l'alias du keystore à partir de la signature
     -Récupération des certificats (ou clé publique et DN directement) à partir du keystore
     -Déchiffrage et affichage du DN
-    */
-    
+    */    
     
 }
