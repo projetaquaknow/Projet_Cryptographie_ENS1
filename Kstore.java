@@ -118,7 +118,15 @@ public class Kstore{
          kstore.setCertificateEntry(alias, cert);
      }
      
-     
+     /**
+      * Trouve l'alias correspondant à un certificat
+      * @param cert Le certificat qui sert de base à la comparaison
+      * @return L'alias correspondant au certificat si celui-ci correspond à une entrée
+      * @throws KeyStoreException 
+      */
+     public String getCertificateAlias(Certificate cert) throws KeyStoreException {
+         return kstore.getCertificateAlias(cert);
+     }
      
      /**
       * D�monstration de la classe.
