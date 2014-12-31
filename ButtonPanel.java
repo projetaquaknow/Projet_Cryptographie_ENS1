@@ -11,6 +11,9 @@ package GUI;
 
 import java.awt.event.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 
@@ -69,7 +72,11 @@ class ButtonPanel extends JPanel implements ActionListener{
             
             if(source==BoutonSignature){
                SignatureGUI signaturegui=new SignatureGUI();
-	       signaturegui.getSignatureGUI();
+                try {
+                    signaturegui.getSignatureGUI();
+                } catch (IOException ex) {
+                    Logger.getLogger(ButtonPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
             if(source==BoutonVerification){
