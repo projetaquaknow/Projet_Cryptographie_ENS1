@@ -64,11 +64,6 @@ class ButtonPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent evt) 	
 	{
 	    Object source = evt.getSource();
-	    Color color = getBackground();
-	    if (source == BoutonSignature) color = Color.blue;
-	    else if (source == BoutonVerification) color = Color.red;
-	    setBackground(color);
-	    repaint();
             
             if(source==BoutonSignature){
                SignatureGUI signaturegui=new SignatureGUI();
