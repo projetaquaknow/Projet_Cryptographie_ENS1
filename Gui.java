@@ -12,6 +12,9 @@
 
 package GUI;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -33,11 +36,15 @@ public class Gui {
 		SwingUtilities.invokeLater(new Runnable() {
 	         @Override
 	         public void run() {
-	              new FileBrowser().setVisible(true);
+                     try {
+                         new FileBrowser().setVisible(true);
+                     } catch (IOException ex) {
+                         Logger.getLogger(Gui.class.getName()).log(Level.SEVERE, null, ex);
+                     }
 	         }
+                 
 	         
 	         });
 	  }
 
 }
-
