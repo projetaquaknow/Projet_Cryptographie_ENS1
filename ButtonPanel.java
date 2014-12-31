@@ -78,4 +78,3 @@ class ButtonPanel extends JPanel implements ActionListener{
 	}
 
 }
-
