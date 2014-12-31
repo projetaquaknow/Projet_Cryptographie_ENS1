@@ -1,18 +1,28 @@
 package Signature;
 
+import Test_Cryptographie.CA;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
+import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Enumeration;
 import org.apache.commons.codec.binary.Base64;
@@ -21,7 +31,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * La classe ECSigner permet de signer
- * des documents avec l'algorithme ECDSA
+ * des documents avec l'algorithme RSA
  * (Elliptic Curve Digital Signature Algorithm)
  * @author David Carmona-Moreno
  * @author Patrick Guichet
@@ -54,14 +64,14 @@ public class ECSigner {
           * @param curveName Le nom officiel de la courbe elliptique utilisée
           * @throws GeneralSecurityException On génère cette exception si le constructeur de ECKeyPairGenerator échoue
           */
-         public ECKeyPairGenerator(String curveName) throws GeneralSecurityException {
+         public ECKeyPairGenerator(String typecle) throws GeneralSecurityException {
             
             // Construction d'une instance d'un générateur de paires de clés.
             // L'algorithme utilisé est le ECDSA.
-            this.kpg = KeyPairGenerator.getInstance("ECDSA");
+            this.kpg = KeyPairGenerator.getInstance(typecle);
             
-            //On initialise le générateur de paires de clés.
-            kpg.initialize(new ECGenParameterSpec(curveName));
+            //On initialise le générateur de paires de clés à 2048 bits
+            kpg.initialize(2048);
         }
          
          /**
@@ -120,7 +130,7 @@ public class ECSigner {
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         
         // le buffer de lecture
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[1024];//J'ai changé de 1024 à 2048 bits
         
         // le nombre d'octets lus
         int nl;
@@ -162,7 +172,7 @@ public class ECSigner {
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         
         // le buffer de lecture
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[1024];//J'ai changé de 1024 à 2048
         
         // le nombre d'octets lus
         int nl;
@@ -188,7 +198,7 @@ public class ECSigner {
         return verifyFile(new File(fileName), publicKey, tagB64);
     }
     
-        /**
+    /**
     * Lecture du fichier contenant le chemin du fichier
     * @param myfile Le nom du fichier contenant le chemin du fichier
     */
@@ -207,7 +217,8 @@ public class ECSigner {
              
         return readline;
     }
+           
+    
 }
 
     
-
