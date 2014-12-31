@@ -1,7 +1,7 @@
 /*
  * FileTypeFilter.java
  *
- * Version mise à jour le 21 Décembre 2014
+ * Version mise ï¿½ jour le 21 Dï¿½cembre 2014
  * 
  * @author Maithili Vinayagamoorthi
  * @version 1.1
@@ -52,7 +52,7 @@ public class FileTypeFilter extends FileFilter {
 	}
 	
 	/**
-	 * Donne l'extension du fichier séléctionné
+	 * Donne l'extension du fichier sï¿½lï¿½ctionnï¿½
 	 * 
 	 * @author        Maithili Vinayagamoorthi  
 	 */
