@@ -187,6 +187,26 @@ public class ECSigner {
             throws GeneralSecurityException, IOException {
         return verifyFile(new File(fileName), publicKey, tagB64);
     }
+    
+        /**
+    * Lecture du fichier contenant le chemin du fichier
+    * @param myfile Le nom du fichier contenant le chemin du fichier
+    */
+    public static String Read_ECSigner(String myfile) throws FileNotFoundException, IOException{
+       
+        // Flux d'entrée ds données contenues dans un fichier
+        FileInputStream fileinput=new FileInputStream(new File(myfile));
+             
+        // Buffer de lecture
+        BufferedReader in=new BufferedReader(new FileReader(myfile));
+             
+        // Lecture de toute une ligne
+        String readline=in.readLine();
+             
+        in.close();
+             
+        return readline;
+    }
 }
 
     
