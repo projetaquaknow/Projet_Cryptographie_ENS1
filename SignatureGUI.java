@@ -1,7 +1,7 @@
 /*
  * SignatureGUI.java
  *
- * Version mise � jour le 22 D�cembre 2014
+ * Version mise à jour le 22 Décembre 2014
  * 
  * @author Cathie Prigent
  * @version 1.1
@@ -9,15 +9,22 @@
 
 package GUI;
 
+import Signature.ECSigner;
+import Signature.ECSignerTest;
 import Test_Cryptographie.CA;
+import java.awt.Button;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,6 +42,8 @@ import javax.swing.JTextField;
  */
 public class SignatureGUI {
 	
+    // Bouton signer
+    private JButton mybutton;
 	/**
 	  * Affiche la fenetre d�crite 
 	  * pr�c�demment
@@ -53,6 +62,9 @@ public class SignatureGUI {
          // Permet de récupérer le chemin du fichier choisi par l'utilisateur
          String m=this.Read_SignatureGUI("path.txt");
          
+         // Instance du bouton signer
+         mybutton= new JButton("Signer");
+         
          contentPane.add(new JLabel("File name : "));
          contentPane.add(new JLabel(m));
          contentPane.add(new JLabel("Nom du signataire : "));
@@ -61,10 +73,21 @@ public class SignatureGUI {
          contentPane.add(new JLabel("Prénom"));
          contentPane.add(new JLabel("Mot de passe : "));
          contentPane.add(new JTextField(25));
-         contentPane.add(new JButton("Signer"));
+         contentPane.add(mybutton);
          
          frame.pack();
          frame.setVisible(true);
+         
+          mybutton.addActionListener(new ActionListener() {
+	    	 
+	         @Override
+	         public void actionPerformed(ActionEvent evt) {
+                     buttonActionPerformed(evt);
+	         }
+	     
+          });
+         
+
      
      }
      
@@ -87,6 +110,16 @@ public class SignatureGUI {
              
              return readline;
     }
+    
+    /**
+     * On lance la procédure de signature de fichier lorsq'on clique sur le bouton "Signer"
+     * @param evt Evénement souris
+     */
+    public void buttonActionPerformed(ActionEvent evt){
+        System.out.println("Salut");
+        //Instance de la classe qui réalise la procédure de signature
+        Signature.ECSignerTest ecsignertest=new Signature.ECSignerTest();
+        
+    }
 
 }
-
