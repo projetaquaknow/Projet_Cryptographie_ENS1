@@ -9,6 +9,7 @@ import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import keyStore.Kstore;
@@ -25,15 +26,39 @@ public class Verification {
      * @param alias Le nom sous lequel est stocké la clé privée
      * @param keypwd Le mot de passe protégeant la clé privée
      * @return La clé privée recherchée
+     * @throws java.security.KeyStoreException
+     * @throws java.security.NoSuchAlgorithmException
      */
-    public Key retrievePrivKey(String alias, char[] keypwd) {
+    public Key retrievePrivKey(String alias, char[] keypwd) throws KeyStoreException, NoSuchAlgorithmException {
         try {
             return mystore.getKey(alias, keypwd);
         } catch (UnrecoverableKeyException ex) {
             Logger.getLogger(Verification.class.getName()).log(Level.SEVERE, null, ex);
             return null;
-        } catch (KeyStoreException | NoSuchAlgorithmException ex) {
+        }
+    }
+
+    /**
+     * Permet de récupérer le DN à partir du certificat joint avec le fichier signé
+     * @param Cert Le certificat à partir duquel obtenir le DN
+     * @return Le DN de l'émetteur
+     */
+    public String retrieveDN(X509Certificate Cert) {
+        return Cert.getIssuerDN().getName();
+    }
+    
+    /**
+     * Permet de vérifier si le certificat est présent dans le keystore
+     * (est ce que cela revient vraiment à vérifier le DN ?)
+     * @param Cert Le certificat à comparer avec ceux du keystore
+     * @return True si le certificat existe déjà, False sinon
+     */
+    public boolean verifyDN(X509Certificate Cert) {
+        try {
+            return (mystore.getCertificateAlias(Cert).equals("") ?  false : true);
+        } catch (KeyStoreException ex) {
             Logger.getLogger(Verification.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
     
