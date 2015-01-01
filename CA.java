@@ -57,9 +57,10 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * Une classe implémentant une autorité de certification
+ * 
+ * @author Cathie Prigent
+ * @author Maithilie Vinayagamoorthi
  * @author David Carmona-Moreno
- * @author Patrick Guichet
- * @author Julien Lepagnot
  */
 public class CA {
      
@@ -73,7 +74,7 @@ public class CA {
     private static final String ALIAS = "miageCA";
     
     // Le chemin du fichier contenant le keystore du CA
-    private static final String CA_KS_FILE = "ksta.ks";
+    private static final String CA_KS_FILE = "ksca.ks";
     
     // L'OID de l'algorithme SHA-1
     private static final String SHA1_OID = "1.3.14.3.2.26";
@@ -224,9 +225,9 @@ public class CA {
     
     /**
      * Classe interne qui permet de générer le Keystore
-     * @author David Carmona-Moreno
      * @author Cathie Prigent
      * @author Maithili Vinayagamoorthi
+     * @author David Carmona-Moreno
      */
     public static class KStore {
         
@@ -235,14 +236,6 @@ public class CA {
    
         // Mot de passe du Keystore
         private char[] kstorepwd;
-     
-        private static final Map<String, String> OID_MAP = new HashMap<>();
-        static {
-            OID_MAP.put("1.2.840.113549.1.9.1", "emailAddress");
-            OID_MAP.put("1.2.840.113549.1.9.2", "unstructuredName");
-            OID_MAP.put("1.2.840.113549.1.9.8", "unstructuredAddress");
-            OID_MAP.put("1.2.840.113549.1.9.16", "S/MIME Object Identifier Registry");
-        }
      
         /**
          * Constructeur de la classe Kstore
@@ -314,7 +307,7 @@ public class CA {
     * @throws GeneralSecurityException si la fabrication du certificat échoue
     * @throws IOException si la fabrication du numéro de série échoue 
     */
-    X509Certificate generateServerCertificate(String dn, String altName, PublicKey pk)
+    X509Certificate generateUserCertificate(String dn,PublicKey pk)
                 throws GeneralSecurityException, IOException, OperatorCreationException {
                    
         // Génération d'un numéro de série aléatoire
@@ -325,7 +318,7 @@ public class CA {
         X500Name caDnI = new X500Name(DN);
         
         // Le nom du sujet
-        X500Name caDnS=new X500Name(SDN);
+        X500Name caDnS=new X500Name(dn);
         
         // Instance d'un calendrier
         Calendar calendar = Calendar.getInstance();
@@ -347,10 +340,6 @@ public class CA {
         // Extension définissant l'usage de la clé
         certGen.addExtension(
             Extension.keyUsage, false, new KeyUsage(SV_KEY_USAGE_VALUE));
-        
-        // Extension définissant le nom alternatif du serveur
-        certGen.addExtension(
-            Extension.subjectAlternativeName, true, new GeneralNames(new GeneralName(GeneralName.dNSName,altName)));
         
         // extension subjectKeyIdentifier
         certGen.addExtension(
@@ -394,7 +383,7 @@ public class CA {
     }
          
     
-    public static void main(String[] args) throws KeyStoreException{
+    public static void main(String[] args) throws KeyStoreException, GeneralSecurityException, IOException, OperatorCreationException{
       
         try {
             // Pour pouvoir utiliser l'API BouncyCastle au travers du mécanisme standard du JCE
@@ -418,35 +407,34 @@ public class CA {
             // Récupération de la clé publique
             PublicKey pub=caKp.getPublic();
             
-            X509Certificate srvCert = ca.generateServerCertificate(
-                    "CN=secure.entreprise.fr, OU=FST, O=UHA, L=Mulhouse, ST=68093, C=FR",
-                    "secure.entreprise.com",
+            X509Certificate usrCert = ca.generateUserCertificate(
+                    "CN=Charles Paris, OU=FST, O=UHA, L=Mulhouse, ST=68093, C=FR",
                     pub);
             
             // Exportation du certificat du serveur
-            CA.exportCertificate("srv.cer", srvCert);
+            CA.exportCertificate("usrCert.cer", usrCert);
             
             // Exportation du certificat du CA
             CA.exportCertificate("ca.cer", ca.caCert);
             
             // Création d'un chemin de certification pour srvCert
-            CertificateFactory factory = CertificateFactory.getInstance("X509");
+            /*CertificateFactory factory = CertificateFactory.getInstance("X509");
             List list = new ArrayList();
-            list.add(srvCert);
+            list.add(usrCert);
             CertPath cp = factory.generateCertPath(list);
             byte[] encoded = cp.getEncoded("PKCS7");
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream("srv.p7b"))) {
-                out.write(encoded);
-            }
+                out.write(encoded);*/
+            //}
             
             // Générer une instance de PrivateKeyEntry contenant la clé privée
-            PrivateKeyEntry priventry=new PrivateKeyEntry(priv,new Certificate[]{srvCert});
+            PrivateKeyEntry priventry=new PrivateKeyEntry(priv,new Certificate[]{usrCert});
             
             // La clé privée est associée à un alias et est protégée par un mot de passe
-	    mystore.enterpk("key1", priventry, new KeyStore.PasswordProtection("qwerty".toCharArray()));
+	    mystore.enterpk("key3", priventry, new KeyStore.PasswordProtection("charles".toCharArray()));
             
             // On associe un certificat à l'alias
-            mystore.entercert("key2", srvCert);
+            mystore.entercert("key4", usrCert);
             
             //Sauver le Keystore
             mystore.save("kstore.ks","azerty".toCharArray());
@@ -461,4 +449,5 @@ public class CA {
             Logger.getLogger(CA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
 }
