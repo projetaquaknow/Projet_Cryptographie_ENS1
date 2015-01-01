@@ -1,9 +1,9 @@
-/*
+//*
  * Verification.java
  *
- * Version mise à jour le 21 Décembre 2014
+ * Version mise Ã  jour le 21 Dï¿½cembre 2014
  * 
- * @author Clément Chambat
+ * @author ClÃ©ment Chambat
  * @version 1.1
  */
 
@@ -31,7 +31,7 @@ import javax.swing.JPanel;
  * 
  * La classe Verification permet d'afficher
  * une fenetre qui montre le Distinguished Name
- * du signataire et le nom du fichier vérifié.
+ * du signataire et le nom du fichier vï¿½rifiï¿½.
  */
 public class Verification extends JFrame 
 {
@@ -47,7 +47,7 @@ public class Verification extends JFrame
     public Verification()
     {
     	
-       this.setTitle("Vérification");
+       this.setTitle("Vï¿½rification");
        this.setSize(400, 100);
        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
        this.setLocationRelativeTo(null);
