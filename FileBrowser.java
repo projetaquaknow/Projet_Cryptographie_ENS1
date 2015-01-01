@@ -1,7 +1,7 @@
 /*
  * FileBrowser.java
  *
- * Version mise � jour le 21 D�cembre 2014
+ * Version mise à jour le 21 Décembre 2014
  * 
  * @author Maithili Vinayagamoorthi
  * @version 1.1
@@ -21,7 +21,7 @@ import javax.swing.JFrame;
 /**
  * FileBrowser
  * 
- * Dans la classe FileBrowser on cr�� une fenetre
+ * Dans la classe FileBrowser on créé une fenetre
  * et on y ajoute l'explorateur de fichiers et 
  * les deux boutons "Signature" et "V�rification".
  */
@@ -55,7 +55,6 @@ public class FileBrowser extends JFrame {
                 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(520, 200);
-		setLocationRelativeTo(null); // center on screen
-                
+		setLocationRelativeTo(null); // center on screen    
         }
 }
