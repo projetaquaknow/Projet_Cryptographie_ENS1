@@ -1,52 +1,84 @@
 package Signature;
 
-import GUI.jFilePicker;
+import Signature.Signer.PairGenerator;
+import Test_Cryptographie.Extract;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static Signature.ECSigner.ECKeyPairGenerator;
-
+import javax.security.auth.x500.X500Principal;
 
 /**
- * Classe de démonstration de ECSigner
+ * Classe de démonstration de Signer
  * @author David Carmona-Moreno
  * @author Patrick Guichet
  */
-public class ECSignerTest {
+public class SignerTest {
     
-    public ECSignerTest(){
+    public SignerTest(){
         try {
             
             // Création de l'objet signant et vérifiant une signature
-            ECSigner ecs = new ECSigner("SHA256withECDSA");
+            Signer signer = new Signer("SHA1withRSA");
+            Extract extract =new Extract();
             
-            // Générateur de clés basé sur la courbe (en caractéristique 2) "c2pnb208w1"
-            ECKeyPairGenerator eckp = new ECKeyPairGenerator("c2pnb208w1");
-            KeyPair kp = eckp.getECKeyPair();
+            // Générateur de clés basé sur la courbe (en caractéristique 2) "
+            PairGenerator pg = new PairGenerator("RSA");
+            /*KeyPair kp=pg.getPair();
+            RSAPrivateKey priv = (RSAPrivateKey) kp.getPrivate();*/
             
-            // Lire le fichier contenant le chemin du fichier choisi par l'utilisateur
-            String path=ECSigner.Read_ECSigner("path.txt");
+            // Lire le fichier qui contient le chemin du fichier choisi par l'utilisateur
+            String path=Signer.Read_Signer("path.txt");
             System.out.println(path);
             
+            // Obtenir la clé privée associée à l'entrée de type PrivateKeyEntry
+            RSAPrivateKey mykey=(RSAPrivateKey)extract.extractPrivateKey("key1", "qwerty".toCharArray());
+            System.out.println(mykey.getModulus());
+            System.out.println(mykey.getPrivateExponent());
+            System.out.println("\n");
+            
+            // Obtenir la clé privée associée à l'entrée de type Certificat
+            PublicKey pubkey=extract.getCertPublicKey("key2");
+            System.out.println(pubkey.toString());
+            System.out.println("\n");
+            
+            // Obtenir le DN associé à l'entrée de type certificat
+            X500Principal mydn=extract.getSubjectDN("key4");
+            System.out.println(mydn.toString());
+            
             // Affichage des clés
-            System.out.printf("Clée privée :\n\t%s\n", kp.getPrivate().toString());
-            System.out.printf("Clée publique :\n\t%s\n", kp.getPublic().toString());
+            //System.out.println("Modulus: ");
+            //System.out.println(priv.getModulus());
+            
+            //System.out.println("Exposant: ");
+            //System.out.println(priv.getPrivateExponent());
+            
+            //System.out.printf("Clée publique :\n\t%s\n", kp.getPublic().toString());
             
             // Calcul de la signature d'un fichier
-            String tag = ecs.signFile(path, kp.getPrivate());
+            String tag = signer.signFile(path, mykey);
             System.out.printf("Tag signature : %s\n", tag);
+            
+            // Ecriture dans un fichier de la signature obtenue
+            signer.WriteSignature(tag);
            
             // Vérification de la signature de ce même fichier
             System.out.printf(
-                    "Vérification : %B\n", ecs.verifyFile(path,
-                    kp.getPublic(),
+                    "Vérification : %B\n", signer.verifyFile(path,
+                    pubkey,
                     tag));
+            
+            // Copier le DN dans le fichier signature
+            extract.WriteDN(mydn);
+            
         } catch (IOException ex) {
-            Logger.getLogger(ECSignerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SignerTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GeneralSecurityException ex) {
-            Logger.getLogger(ECSignerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SignerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
