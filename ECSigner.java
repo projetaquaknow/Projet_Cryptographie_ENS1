@@ -3,12 +3,17 @@ package Signature;
 import Test_Cryptographie.CA;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -30,21 +35,13 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
- * La classe ECSigner permet de signer
+ * La classe Signer permet de signer
  * des documents avec l'algorithme RSA
  * (Elliptic Curve Digital Signature Algorithm)
  * @author David Carmona-Moreno
  * @author Patrick Guichet
  */
-public class ECSigner {
-    
-    // Installation du provider BouncyCastle.
-    // Il fournit toutes les méthodes et classes
-    // afin de mettre en place une signature de type
-    // ECDSA.
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+public class Signer {
     
     // Obtention d'une instance du service SecureRandom qui génère 
     // une suite de bits cryptographiquement surs.
@@ -54,61 +51,46 @@ public class ECSigner {
      * Classe interne permettant de générer des clés
      * DSA
      */
-    public static class ECKeyPairGenerator{
+    public static class PairGenerator{
         
         // Générateur de paires de clés
          private KeyPairGenerator kpg;
          
          /**
-          * Constructeur de la classe ECKeyPairGenerator
-          * @param curveName Le nom officiel de la courbe elliptique utilisée
-          * @throws GeneralSecurityException On génère cette exception si le constructeur de ECKeyPairGenerator échoue
+          * Constructeur de la classe PairGenerator
+          * @param algorithm Le nom officiel de l'algorithme utilisé
+          * @throws GeneralSecurityException On génère cette exception si le constructeur de Generator échoue
           */
-         public ECKeyPairGenerator(String typecle) throws GeneralSecurityException {
+         public PairGenerator(String algorithm) throws GeneralSecurityException {
             
             // Construction d'une instance d'un générateur de paires de clés.
-            // L'algorithme utilisé est le ECDSA.
-            this.kpg = KeyPairGenerator.getInstance(typecle);
+            // L'algorithme utilisé est le RSA.
+            this.kpg = KeyPairGenerator.getInstance(algorithm);
             
             //On initialise le générateur de paires de clés à 2048 bits
             kpg.initialize(2048);
         }
          
          /**
-         * Génération de la paire de clés pour l'algorithme ECDSA
-         * @return La paire de clés ECDSA générée.
+         * Génération de la paire de clés pour l'algorithme RSA
+         * @return La paire de clés RSA générée.
          */
-         public KeyPair getECKeyPair() {
+         public KeyPair getPair() {
              return kpg.generateKeyPair();
         }
          
-         /**
-         * Méthode listant les courbes implémentées par le provider
-         * @return Une liste des noms officiels des courbes elliptiques implémentées par le Provider
-         */
-         public static String getCurvesNames() {
-             
-             StringBuilder sb = new StringBuilder();
-             
-             // Boucle de parcours de toute la liste des courbes implémentées par 
-             // BouncyCastle
-             for(Enumeration<String> curves = ECNamedCurveTable.getNames(); curves.hasMoreElements();){
-                 
-                sb.append(curves.nextElement()).append('\n');
-             }
-             return sb.toString();
-         }
+         
     }
     
     // L'objet chargé du calcul de la signature
     private Signature signer;
     
      /**
-     * Constructeur de la classe ECSigner.
+     * Constructeur de la classe Signer.
      * @param algorithm L'algorithme implémenté
-     * @throws GeneralSecurityException On génère cette exception si le constructeur de ECSigner échoue
+     * @throws GeneralSecurityException On génère cette exception si le constructeur de Signer échoue
      */
-    public ECSigner(String algorithm) throws GeneralSecurityException {
+    public Signer(String algorithm) throws GeneralSecurityException {
         
         // Construction d'une instance du signataire de fichiers.
         this.signer = Signature.getInstance(algorithm);
@@ -152,6 +134,13 @@ public class ECSigner {
      */
     public String signFile(String fileName, PrivateKey privateKey)
             throws GeneralSecurityException, IOException {
+        
+        // Variable qui permet de récupérer la signature du fichier
+        String sgfile=signFile(new File(fileName), privateKey);
+        
+        // Appel à la méthode permettant d'écrire dans un fichier la signature obtenue
+        this.WriteSignature(sgfile);
+        
         return signFile(new File(fileName), privateKey);
     }
     
@@ -202,7 +191,7 @@ public class ECSigner {
     * Lecture du fichier contenant le chemin du fichier
     * @param myfile Le nom du fichier contenant le chemin du fichier
     */
-    public static String Read_ECSigner(String myfile) throws FileNotFoundException, IOException{
+    public static String Read_Signer(String myfile) throws FileNotFoundException, IOException{
        
         // Flux d'entrée ds données contenues dans un fichier
         FileInputStream fileinput=new FileInputStream(new File(myfile));
@@ -217,8 +206,28 @@ public class ECSigner {
              
         return readline;
     }
-           
     
+    /**
+     * On génère un fichier texte(.txt) contenant la signature 
+     * du fichier choisi par l'utilisateur
+     * @param sig La signature du fichier
+     */
+    public static void WriteSignature(String sig) throws FileNotFoundException, UnsupportedEncodingException, IOException{
+        
+        // Flux de sortie récupéré dans un fichier
+        FileOutputStream fileoutput=new FileOutputStream(new File("filesignature.txt"));
+             
+        // Conversion du paramètre path_buffer en un tableau de byte
+        byte[] b=sig.getBytes("UTF-8");
+             
+        // Ecriture du tableau de byte dans le fichier
+        fileoutput.write(b);
+                
+        // Fermeture du flux
+        fileoutput.close();
+        
+    } 
 }
 
     
+
