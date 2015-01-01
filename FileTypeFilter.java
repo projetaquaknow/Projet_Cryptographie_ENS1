@@ -1,181 +1,63 @@
 /*
- * SignatureGUI.java
+ * FileTypeFilter.java
  *
- * Version mise à jour le 22 Décembre 2014
+ * Version mise � jour le 21 D�cembre 2014
  * 
- * @author Cathie Prigent
+ * @author Maithili Vinayagamoorthi
  * @version 1.1
  */
 
 package GUI;
 
-import Signature.Signer;
-import Signature.SignerTest;
-import Signature.TestSignature;
-import Test_Cryptographie.CA;
-import java.awt.Button;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.filechooser.FileFilter;
 
 /**
- * SignatureGUI
+ * FileTypeFilter   
  * 
- * La classe SignatureGUI permet d'afficher
- * une fenetre qui montre le nom du fichier,
- * d'entrer le nom du signataire, le
- * pr�nom du signataire, le mot
- * de passe secondaire et un bouton "Signer".
- * 
+ * Filtrage des fichiers en fonction
+ * de leur extension.
  */
-public class SignatureGUI {
-	
-    // Bouton signer
-    private JButton mybutton;
-    
-    // Case que l'utilisateur doit remplir avec son nom
-    private JTextField surname;
-    
-    // Case que l'utilisateur doit remplir avec son prénom
-    private JTextField name;
-    
-    // Case que l'utilisateur doit remplir avec son mot de passe
-    private JTextField passwd;
-    
-	/**
-	  * Affiche la fenetre décrite 
-	  * pr�écédemment
-	  * 
-	  * @author         Cathie Prigent
-	  */
-     public void getSignatureGUI() throws IOException {
-    	 
-         JFrame frame = new JFrame("Signature");
-         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-         
-         Container contentPane = frame.getContentPane();
-         
-         contentPane.setLayout(new GridLayout(4,2));
-         
-         // Permet de récupérer le chemin du fichier choisi par l'utilisateur
-         String m=this.Read_SignatureGUI("path.txt");
-         
-         // Instance du bouton signer
-         mybutton= new JButton("Signer");
-         
-         // Instance de la case Nom
-         surname=new JTextField();
-         
-         // Instance de la case Prénom
-         name= new JTextField();
-         
-         // Instance de la case Mot de Passe
-         passwd= new JTextField();
-         
-         
-         contentPane.add(new JLabel("File name : "));
-         contentPane.add(new JLabel(m));
-         contentPane.add(new JLabel("Nom du signataire : "));
-         contentPane.add(surname);
-         
-         this.getSurname(surname);
-         
-         contentPane.add(new JLabel("Prénom du signataire : "));
-         contentPane.add(name);
-         
-         this.getName(name);
-         
-         contentPane.add(new JLabel("Mot de passe : "));
-         contentPane.add(passwd);
-         
-         this.getPassword(passwd);
-         
-         contentPane.add(mybutton);
-         
-         frame.pack();
-         frame.setVisible(true);
-         
-         //Ajouter un écouteur d'événements au bouton
-         mybutton.addActionListener(new ActionListener() {
-	    	 
-	         @Override
-	         public void actionPerformed(ActionEvent evt) {
-                     buttonActionPerformed(evt);
-	         }
-	     
-          });
-     
-     }
-     
-    /**
-     * Méthode permettant de lire le contenu du fichier contenant le chemin du fichier choisi par l'utilisateur
-     * @param file Le nom du fichier contenant le chemin du fichier choisi par l'utilisateur
-     * @return  Le chemin du fichier
-     */
-    public String Read_SignatureGUI(String file) throws FileNotFoundException, IOException{
-        // Flux d'entrée ds données contenues dans un fichier
-             FileInputStream fileinput=new FileInputStream(new File("path.txt"));
-             
-             // Buffer de lecture
-             BufferedReader in=new BufferedReader(new FileReader("path.txt"));
-             
-             // Lecture de toute une ligne
-             String readline=in.readLine();
-             
-             in.close();
-             
-             return readline;
-    }
-    
-    /**
-     * On lance la procédure de signature de fichier lorsq'on clique sur le bouton "Signer"
-     * @param evt Evénement souris
-     */
-    public void buttonActionPerformed(ActionEvent evt){
-        System.out.println("Salut");
-        //Instance de la classe qui réalise la procédure de signature
-        Signature.SignerTest ecsignertest=new Signature.SignerTest();
-        
-    }
-    
-    /**
-     * Méthode qui permet de récupérer le nom
-     * @param surnme La case contenant le nom du signataire
-     */
-    public String getSurname(JTextField surnme){
-        System.out.println(surnme.getText());
-        return surnme.getText();
-    }
-    
-    /**
-     * Méthode qui permet de récupérer le prénom
-     * @param nme Le prénom du signataire
-     */
-    public String getName(JTextField nme){
-        System.out.println(nme.getText());
-        return nme.getText();
-    }
-    
-    /**
-     * Méthode qui permet de récupérer le mot de passe
-     * @param password Le mot de passe
-     */
-    public String getPassword(JTextField password){
-        //System.out.println(password.getText());
-        return password.getText();
-    }
+public class FileTypeFilter extends FileFilter {
 
+	private String extension;
+	private String description;
+	
+	/**
+	 * Constructeur de la classe FileTypeFilter
+	 */
+	public FileTypeFilter(String extension, String description) 
+	{
+	    this.extension = extension;
+	    this.description = description;
+	}
+	
+	/**
+	 * Fonction qui filtre les fichiers en fonction
+	 * de leur extension
+	 * 
+	 * @param file      Fichier
+	 * @author          Maithili Vinayagamoorthi
+	 * 
+	 */
+	@Override
+	public boolean accept(File file) 
+	{
+	     if (file.isDirectory()) 
+	     {
+	         return true;
+	     }
+	     
+	     return file.getName().toLowerCase().endsWith(extension);
+	}
+	
+	/**
+	 * Donne l'extension du fichier s�l�ctionn�
+	 * 
+	 * @author        Maithili Vinayagamoorthi  
+	 */
+	public String getDescription() 
+	{
+	     return description + String.format(" (*%s)", extension);
+	}
 }
