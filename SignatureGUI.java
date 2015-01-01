@@ -9,8 +9,9 @@
 
 package GUI;
 
-import Signature.ECSigner;
-import Signature.ECSignerTest;
+import Signature.Signer;
+import Signature.SignerTest;
+import Signature.TestSignature;
 import Test_Cryptographie.CA;
 import java.awt.Button;
 import java.awt.Container;
@@ -44,9 +45,19 @@ public class SignatureGUI {
 	
     // Bouton signer
     private JButton mybutton;
+    
+    // Case que l'utilisateur doit remplir avec son nom
+    private JTextField surname;
+    
+    // Case que l'utilisateur doit remplir avec son prénom
+    private JTextField name;
+    
+    // Case que l'utilisateur doit remplir avec son mot de passe
+    private JTextField passwd;
+    
 	/**
-	  * Affiche la fenetre d�crite 
-	  * pr�c�demment
+	  * Affiche la fenetre décrite 
+	  * pr�écédemment
 	  * 
 	  * @author         Cathie Prigent
 	  */
@@ -65,20 +76,40 @@ public class SignatureGUI {
          // Instance du bouton signer
          mybutton= new JButton("Signer");
          
+         // Instance de la case Nom
+         surname=new JTextField();
+         
+         // Instance de la case Prénom
+         name= new JTextField();
+         
+         // Instance de la case Mot de Passe
+         passwd= new JTextField();
+         
+         
          contentPane.add(new JLabel("File name : "));
          contentPane.add(new JLabel(m));
          contentPane.add(new JLabel("Nom du signataire : "));
-         contentPane.add(new JLabel("Nom"));
+         contentPane.add(surname);
+         
+         this.getSurname(surname);
+         
          contentPane.add(new JLabel("Prénom du signataire : "));
-         contentPane.add(new JLabel("Prénom"));
+         contentPane.add(name);
+         
+         this.getName(name);
+         
          contentPane.add(new JLabel("Mot de passe : "));
-         contentPane.add(new JTextField(25));
+         contentPane.add(passwd);
+         
+         this.getPassword(passwd);
+         
          contentPane.add(mybutton);
          
          frame.pack();
          frame.setVisible(true);
          
-          mybutton.addActionListener(new ActionListener() {
+         //Ajouter un écouteur d'événements au bouton
+         mybutton.addActionListener(new ActionListener() {
 	    	 
 	         @Override
 	         public void actionPerformed(ActionEvent evt) {
@@ -86,8 +117,6 @@ public class SignatureGUI {
 	         }
 	     
           });
-         
-
      
      }
      
@@ -118,8 +147,35 @@ public class SignatureGUI {
     public void buttonActionPerformed(ActionEvent evt){
         System.out.println("Salut");
         //Instance de la classe qui réalise la procédure de signature
-        Signature.ECSignerTest ecsignertest=new Signature.ECSignerTest();
+        Signature.SignerTest ecsignertest=new Signature.SignerTest();
         
+    }
+    
+    /**
+     * Méthode qui permet de récupérer le nom
+     * @param surnme La case contenant le nom du signataire
+     */
+    public String getSurname(JTextField surnme){
+        System.out.println(surnme.getText());
+        return surnme.getText();
+    }
+    
+    /**
+     * Méthode qui permet de récupérer le prénom
+     * @param nme Le prénom du signataire
+     */
+    public String getName(JTextField nme){
+        System.out.println(nme.getText());
+        return nme.getText();
+    }
+    
+    /**
+     * Méthode qui permet de récupérer le mot de passe
+     * @param password Le mot de passe
+     */
+    public String getPassword(JTextField password){
+        //System.out.println(password.getText());
+        return password.getText();
     }
 
 }
