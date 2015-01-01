@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -19,28 +20,21 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
-import java.security.cert.CertPath;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.asn1.x500.X500Name;
 import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.HashMap;
-import java.util.Map;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.cert.X509ExtensionUtils;
@@ -242,20 +236,20 @@ public class CA {
          * @param algoType    Le type du Keystore
          * @param passwd      Le mot de passe du Keystore
          */
-        private KStore(String algoType,char[] passwd) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+        KStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     	  
     	    // Construction d'une instance d'un keystore de type type
-            kstore = KeyStore.getInstance(algoType);
+            kstore = KeyStore.getInstance("JCEKS");
           
             // Initialisation du keystore avec le contenu du fichier file
             InputStream is = new BufferedInputStream(new FileInputStream(new File("kstore.ks")));
-            kstore.load(is,passwd);
+            kstore.load(is,"azerty".toCharArray());
           
             // Il faut garder le mot de passe du keystore pour l'utiliser par défaut
             // lorsque l'utilisateur de la classe ne précise pas de mot de passe
             // pour insérer une nouvelle entrée dans le keystore de l'instance
             // (la seule méthode concernée est importSecretKey)
-            kstorepwd = passwd;
+            kstorepwd = "azerty".toCharArray();
         }
      
         /**
@@ -296,6 +290,41 @@ public class CA {
             kstore.setCertificateEntry(alias, cert);
         }
         
+        /**
+         * Méthode qui permet de savoir si l'entrée identifiée par l'alias est de type clé privée
+         * @param alias L'identificateur de l'entrée
+         * @return Si l'entrée est de type clé privée alors la méthode envoi true sinon false
+         * @throws KeyStoreException  On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
+         */
+        public final boolean isPrivateKeyEntry(String alias) throws KeyStoreException{
+            return kstore.isKeyEntry(alias);
+        }
+        
+        /**
+         * Méthode qui permet de récupérer la clé privée d'une entrée de type PrivateKey
+         * @param alias L'identificateur de l'entrée
+         * @param entrypasswd Le mot de passe de l'entrée
+         */
+        public final Key getPrivateKey(String alias,char[] entrypasswd) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException{
+            return kstore.getKey(alias, entrypasswd);
+            
+        }
+        
+        /**
+         * Méthode qui permet de savoir si l'entrée identifiée par l'alias est une entrée de type certificat
+         * @param alias L'identificateur de l'entrée
+         */
+        public final boolean isCertEntry(String alias) throws KeyStoreException{
+            return kstore.isCertificateEntry(alias);
+        }
+        
+        /**
+         * Méthode qui permet d'obtenir le certificat associé à l'entrée de type Certificat
+         * @param alias L'identificateur de l'entrée
+         */
+        public final X509Certificate getCert(String alias) throws KeyStoreException{
+            return (X509Certificate) kstore.getCertificate(alias);
+        }
     }
     
     /**
@@ -394,7 +423,7 @@ public class CA {
             //CA ca = new CA("azerty".toCharArray());
             
             // Instanciation du Keystore ave tous les DN des utilisateurs
-            KStore mystore=new KStore("JCEKS","azerty".toCharArray());
+            KStore mystore=new KStore();
             
             // Génération d'une paire de clés pour un certificat serveur
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
