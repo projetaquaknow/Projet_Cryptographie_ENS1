@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package crypto.verification;
+package verification;
+
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -18,17 +20,19 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import keyStore.Kstore;
-
+//import java.util.Scanner;
+//import java.util.regex.MatchResult;
 /**
- *
  * @author PrigentC
+ * @author ChambatC
  */
 public class Verification {
-    private Kstore mystore;
+     private Kstore mystore;
     
     //Objet chargé de la vérification de la signature.
     private Signature verifier;
@@ -122,13 +126,23 @@ public class Verification {
             throws GeneralSecurityException, IOException {
         return verifyFile(new File(fileName), publicKey, tagB64);
     }
+
     
-    
-    /*
-    Travail restant :
-    -Récupération de l'alias du keystore à partir de la signature
-    -Récupération des certificats (ou clé publique et DN directement) à partir du keystore
-    -Déchiffrage et affichage du DN
-    */    
+     /** Methode de comparaison du DN contenu dans le keystore avec celui du fichier signature
+     * @param File le fichier signature
+     * @throws FileNotFoundException si le fichier n'existe pas
+     * @throws KeystoreException
+     * @return true si le test est positf sinon false
+     */
+    public boolean VerifDN(String fileName, String alias)throws KeyStoreException, FileNotFoundException{
+    	Scanner s = new Scanner(new File(fileName));
+        if(s.toString().contains(retrieveDN(mystore.getCertificate(alias)))==true)
+            return true;
+        else return false;
+    }
     
 }
+    
+
+    
+    
