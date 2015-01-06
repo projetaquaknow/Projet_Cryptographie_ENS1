@@ -14,7 +14,6 @@ import java.awt.FlowLayout;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 
@@ -26,18 +25,19 @@ import javax.swing.JFrame;
  * les deux boutons "Signature" et "V�rification".
  */
 @SuppressWarnings("serial")
-public class FileBrowser extends JFrame {
+public final class FileBrowser extends JFrame {
 	
 	/**
 	 * Constructeur de la classe FileBrowser
+     * @throws java.io.IOException
 	 */
 	public FileBrowser() throws IOException {
-            
+                super("Cryptography Project");
 		setLayout(new FlowLayout());
 		
 		// Instance de l'explorateur de fichiers
-		jFilePicker filePicker = new jFilePicker("Fichier", "Parcourir...");
-		filePicker.setMode(jFilePicker.MODE_OPEN);
+		JFilePicker filePicker = new JFilePicker("File", "Find...");
+		filePicker.setMode(JFilePicker.MODE_OPEN);
 		filePicker.addFileTypeFilter(".txt", "Text File");
 		filePicker.addFileTypeFilter(".doc", "Document File");
 		filePicker.addFileTypeFilter(".docx", "XML Format Document File");
@@ -54,7 +54,16 @@ public class FileBrowser extends JFrame {
                 //System.out.println(path_main);
                 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                this.delete_path_file();
 		setSize(520, 200);
 		setLocationRelativeTo(null); // center on screen    
+        }
+        
+        /**
+         * Supprime le fichier "path.txt"
+         */
+        public void delete_path_file(){
+            File myfile=new File("path.txt");
+            myfile.delete();        
         }
 }

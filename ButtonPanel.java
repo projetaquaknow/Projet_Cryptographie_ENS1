@@ -10,10 +10,7 @@
 package GUI;
 
 import java.awt.event.*;
-import java.awt.*;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 
@@ -26,16 +23,16 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 class ButtonPanel extends JPanel implements ActionListener{
 	
-	private JButton BoutonSignature;
-	private JButton BoutonVerification;
+	private final JButton BoutonSignature;
+	private final JButton BoutonVerification;
 	
 	/**
 	 * Constructeur de la classe ButtonPanel
 	 */
 	public ButtonPanel() 
 	{
-	    BoutonSignature = new JButton("Signer");
-	    BoutonVerification = new JButton("Verifier");
+	    BoutonSignature = new JButton("Sign");
+	    BoutonVerification = new JButton("Verify");
 	    
 	    // Insertion des 2 boutons dans l'objet ButtonPanel
 	    add(BoutonSignature);
@@ -48,19 +45,20 @@ class ButtonPanel extends JPanel implements ActionListener{
 	
 	/**
 	 * Si on clique sur le bouton "Signature",
-	 * la couleur de fond du panneau contenant
-	 * les boutons "Signature" et "V�rification"
-	 * devient bleu.
-	 * Si on clique sur le bouton "V�rification",
-	 * la couleur de fond du panneau contenant
-	 * les boutons "Signature" et "V�rification" 
-	 * devient rouge.
+	 * et qu'un fichier est choisi alors la fenêtre 
+         * de signature s'affiche.  
+	 * Si on clique sur le bouton "Vérification",
+         * et qu'un fichier est choisi alors la fenêtre 
+         * de vérification s'affiche.
+         * Si un fichier n'est pas choisi alors
+         * une fenêtre d'erreur s'ouvre
 	 * 
 	 * @param evt     Lecture de l'�v�nement souris
 	 * @author        Maithili Vinayagamoorthi
 	 * @version       1.1
 	 * 
 	 */
+        @Override
 	public void actionPerformed(ActionEvent evt) 	
 	{
 	    Object source = evt.getSource();
@@ -70,7 +68,12 @@ class ButtonPanel extends JPanel implements ActionListener{
                 try {
                     signaturegui.getSignatureGUI();
                 } catch (IOException ex) {
-                    Logger.getLogger(ButtonPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    /**
+                     * A modifier s'il n'y a pas de fichier à signer
+                     */
+                    //Logger.getLogger(ButtonPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    final JPanel panel = new JPanel();
+                    JOptionPane.showMessageDialog(panel, "Choose A File!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
             

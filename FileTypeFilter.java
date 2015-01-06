@@ -1,7 +1,7 @@
 /*
  * FileTypeFilter.java
  *
- * Version mise � jour le 21 D�cembre 2014
+ * Version mise à jour le 21 Décembre 2014
  * 
  * @author Maithili Vinayagamoorthi
  * @version 1.1
@@ -20,11 +20,13 @@ import javax.swing.filechooser.FileFilter;
  */
 public class FileTypeFilter extends FileFilter {
 
-	private String extension;
-	private String description;
+	private final String extension;
+	private final String description;
 	
 	/**
 	 * Constructeur de la classe FileTypeFilter
+         * @param extension
+         * @param description
 	 */
 	public FileTypeFilter(String extension, String description) 
 	{
@@ -38,6 +40,7 @@ public class FileTypeFilter extends FileFilter {
 	 * 
 	 * @param file      Fichier
 	 * @author          Maithili Vinayagamoorthi
+         * @return 
 	 * 
 	 */
 	@Override
@@ -54,8 +57,10 @@ public class FileTypeFilter extends FileFilter {
 	/**
 	 * Donne l'extension du fichier s�l�ctionn�
 	 * 
-	 * @author        Maithili Vinayagamoorthi  
+	 * @author   Maithili Vinayagamoorthi  
+         * @return   String: Description du fichier
 	 */
+        @Override
 	public String getDescription() 
 	{
 	     return description + String.format(" (*%s)", extension);

@@ -11,16 +11,13 @@ package GUI;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,13 +37,13 @@ import javax.swing.filechooser.FileFilter;
  * l'explorateur de fichiers.
  */
 @SuppressWarnings("serial")
-public class jFilePicker extends JPanel {
+public class JFilePicker extends JPanel {
 
-	 private JLabel label;
-	 private JTextField textField;
-	 private JButton button;
+	 private final JLabel label;
+	 private final JTextField textField;
+	 private final JButton button;
 	 
-	 private JFileChooser fileChooser;
+	 private final JFileChooser fileChooser;
 	 private int mode;
          
 	 public static final int MODE_OPEN = 1;
@@ -54,8 +51,10 @@ public class jFilePicker extends JPanel {
 	 
 	 /**
 	  * Constructeur de la classe jFilePicker
+          * @param textFieldLabel
+          * @param buttonLabel
 	  */
-	 public jFilePicker(String textFieldLabel, String buttonLabel) {
+	 public JFilePicker(String textFieldLabel, String buttonLabel) {
              
              // Explorateur de fichiers
 	     fileChooser = new JFileChooser();
@@ -65,20 +64,15 @@ public class jFilePicker extends JPanel {
 	     label = new JLabel(textFieldLabel);
 	     textField = new JTextField(30);
 	     button = new JButton(buttonLabel);
-	     button.addActionListener(new ActionListener() {
-	    	 
-	         @Override
-	         public void actionPerformed(ActionEvent evt) {
-                     try {
-                         buttonActionPerformed(evt);
-                     } catch (FileNotFoundException ex) {
-                         Logger.getLogger(jFilePicker.class.getName()).log(Level.SEVERE, null, ex);
-                     } catch (IOException ex) {
-                         Logger.getLogger(jFilePicker.class.getName()).log(Level.SEVERE, null, ex);
-                     }
-	         }
-	     
-	      });
+	     button.addActionListener((ActionEvent evt) -> {
+                 try {
+                     buttonActionPerformed(evt);
+                 } catch (FileNotFoundException ex) {
+                     Logger.getLogger(JFilePicker.class.getName()).log(Level.SEVERE, null, ex);
+                 } catch (IOException ex) {
+                     Logger.getLogger(JFilePicker.class.getName()).log(Level.SEVERE, null, ex);
+                 }
+             });
 	     
 	    add(label);
 	    add(textField);
@@ -91,6 +85,8 @@ public class jFilePicker extends JPanel {
 	  * 
 	  * @param evt      Ev�nement souris
 	  * @author         Maithili Vinayagamoorthi
+          * @throws java.io.FileNotFoundException
+          * @throws java.io.IOException
 	  */
 	 public void buttonActionPerformed(ActionEvent evt) throws FileNotFoundException, IOException {
             
@@ -142,7 +138,7 @@ public class jFilePicker extends JPanel {
         
          /**
           * Méthode qui fixe automatiquement le chemin du fichier choisi
-          * @param path1 Le chemin du fichier tel qu'il est défini dans actionButtonListener
+          * @return 
           */
          public String getPath(){
                return "Salut";
@@ -151,41 +147,46 @@ public class jFilePicker extends JPanel {
          /**
           * Ecriture dans un fichier
           * @param path_buffer Le chemin du fichier
+          * @throws java.io.FileNotFoundException
+          * @throws java.io.UnsupportedEncodingException
           */
          public void Write(String path_buffer) throws FileNotFoundException, UnsupportedEncodingException, IOException{
              
-             // Flux de sortie récupéré dans un fichier
-             FileOutputStream fileoutput=new FileOutputStream(new File("path.txt"));
-             
              // Conversion du paramètre path_buffer en un tableau de byte
-             byte[] b=path_buffer.getBytes("UTF-8");
-             
-             // Ecriture du tableau de byte dans le fichier
-             fileoutput.write(b);
-             
-             // Fermeture du flux
-             fileoutput.close();
+             try ( // Flux de sortie récupéré dans un fichier
+                     FileOutputStream fileoutput = new FileOutputStream(new File("path.txt"))) {
+                 // Conversion du paramètre path_buffer en un tableau de byte
+                 byte[] b=path_buffer.getBytes("UTF-8");
+                 
+                 // Ecriture du tableau de byte dans le fichier
+                 fileoutput.write(b);
+                 
+                 // Fermeture du flux
+             }
          }
          
          /**
           * Lecture du fichier contenant le chemin du fichier
           * @param myfile Le nom du fichier contenant le chemin du fichier
+          * @return 
+          * @throws java.io.FileNotFoundException
           */
          public String Read(String myfile) throws FileNotFoundException, IOException{
              
              // Flux d'entrée ds données contenues dans un fichier
              FileInputStream fileinput=new FileInputStream(new File("path.txt"));
              
-             // Buffer de lecture
-             BufferedReader in=new BufferedReader(new FileReader("path.txt"));
-             
+             String readline;
              // Lecture de toute une ligne
-             String readline=in.readLine();
-             
-             in.close();
+             try ( // Buffer de lecture
+                     BufferedReader in = new BufferedReader(new FileReader("path.txt"))) {
+                 // Lecture de toute une ligne
+                 readline = in.readLine();
+             }
              
              return readline;
          }
+         
                  
          
          
