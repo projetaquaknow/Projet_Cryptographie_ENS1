@@ -1,4 +1,4 @@
-//*
+/*
  * Verification.java
  *
  * Version mise à jour le 21 D�cembre 2014
@@ -19,14 +19,14 @@ import javax.swing.JPanel;
  * 
  * La classe Verification permet d'afficher
  * une fenetre qui montre le Distinguished Name
- * du signataire et le nom du fichier v�rifi�.
+ * du signataire et le nom du fichier verifie.
  */
 public class Verification extends JFrame 
 {
 	
-	private JLabel label1 = new JLabel("DN: ");
+	private JLabel label1 = new JLabel("DN : ");
     private JLabel label2 = new JLabel("Distinguished_Name");
-    private JLabel label3 = new JLabel("Nom Fichier: ");
+    private JLabel label3 = new JLabel("File Name :");
     private JLabel label4 = new JLabel("NOM_FICHIER");
    
     /**
@@ -35,7 +35,7 @@ public class Verification extends JFrame
     public Verification()
     {
     	
-       this.setTitle("V�rification");
+       this.setTitle("Verification");
        this.setSize(400, 100);
        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
        this.setLocationRelativeTo(null);
@@ -48,8 +48,7 @@ public class Verification extends JFrame
        container.add(label4);
     
        this.setContentPane(container);
-       this.setVisible(true);
-       
+       this.setVisible(true);       
     }
     
 }

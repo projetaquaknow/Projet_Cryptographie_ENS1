@@ -17,8 +17,8 @@ import javax.swing.*;
 /**
  * ButtonPanel
  * 
- * Dans la classe ButtonPanel on impl�mente 
- * les boutons "Signature" et "V�rification".
+ * Dans la classe ButtonPanel on implemente 
+ * les boutons "Signature" et "Verification".
  */
 @SuppressWarnings("serial")
 class ButtonPanel extends JPanel implements ActionListener{
@@ -79,6 +79,13 @@ class ButtonPanel extends JPanel implements ActionListener{
             
             if(source==BoutonVerification){
                Verification verif = new Verification();
+			   try {
+					verif.Verification();
+					
+			   } catch (IOException ex) {
+					final JPanel panel = new JPanel();
+                    JOptionPane.showMessageDialog(panel, "Choose A File!", "Error", JOptionPane.ERROR_MESSAGE);
+			   }
             }
 	}
 }

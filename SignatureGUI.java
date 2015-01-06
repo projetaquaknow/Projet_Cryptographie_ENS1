@@ -183,7 +183,7 @@ public class SignatureGUI {
             JFrame parent = new JFrame();
             JOptionPane.showMessageDialog(parent, "File Signed");
             
-        }else {
+        } else {
             final JPanel panel = new JPanel();
             JOptionPane.showMessageDialog(panel, "Data Error Entry!", "Error", JOptionPane.ERROR_MESSAGE);
        }
