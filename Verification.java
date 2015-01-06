@@ -20,11 +20,17 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
-import keyStore.Kstore;
+import keystore.Kstore;
+import Test_Cryptographie.CA;
+import java.security.cert.CertificateException;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 //import java.util.Scanner;
 //import java.util.regex.MatchResult;
 /**
@@ -32,7 +38,7 @@ import keyStore.Kstore;
  * @author ChambatC
  */
 public class Verification {
-     private Kstore mystore;
+     private Kstore kstore;
     
     //Objet chargé de la vérification de la signature.
     private Signature verifier;
@@ -53,7 +59,7 @@ public class Verification {
      */
     public Key retrievePrivKey(String alias, char[] keypwd) throws KeyStoreException, NoSuchAlgorithmException {
         try {
-            return mystore.getKey(alias, keypwd);
+            return kstore.getKey(alias, keypwd);
         } catch (UnrecoverableKeyException ex) {
             Logger.getLogger(Verification.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -77,7 +83,7 @@ public class Verification {
      */
     public boolean verifyDN(X509Certificate Cert) {
         try {
-            return (mystore.getCertificateAlias(Cert).equals("") ?  false : true);
+            return (kstore.getCertificateAlias(Cert).equals("") ?  false : true);
         } catch (KeyStoreException ex) {
             Logger.getLogger(Verification.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -126,21 +132,41 @@ public class Verification {
             throws GeneralSecurityException, IOException {
         return verifyFile(new File(fileName), publicKey, tagB64);
     }
-
     
-     /** Methode de comparaison du DN contenu dans le keystore avec celui du fichier signature
-     * @param File le fichier signature
-     * @throws FileNotFoundException si le fichier n'existe pas
-     * @throws KeystoreException
-     * @return true si le test est positf sinon false
+    
+        
+        
+    
+    /**Methode permettant de comparer le DN extrait du fichier signature avec la liste des DN du keystore en parcourant la liste des certificats
+     * @param DNs DN extrait du fichier signature
+     * @return le certificat associé à ce DN s'il se trouve dans le keystore, sinon null
      */
-    public boolean VerifDN(String fileName, String alias)throws KeyStoreException, FileNotFoundException{
-    	Scanner s = new Scanner(new File(fileName));
-        if(s.toString().contains(retrieveDN(mystore.getCertificate(alias)))==true)
-            return true;
-        else return false;
+    public X509Certificate checkDN(String DNs) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException{
+        X509Certificate c=null;
+        // Avoir la liste des certificats du Keystore
+        List<X509Certificate> certificatelist=this.loop();
+        
+        // Taille de la liste des certificats
+        int list_cert_size=certificatelist.size();
+ 
+        // On va parcourir la liste des certificats
+        int i=0;
+  
+        // Parcourir la liste des certificats
+        while(i!=list_cert_size){
+            X509Certificate cert_buffer=certificatelist.get(i);
+            //System.out.println(cert_buffer.toString());
+                
+                // Si le DN du fichier signature est le meme que celui du certificat
+                if(DNs.equals(cert_buffer.getSubjectDN().toString()) == true){
+                    c= cert_buffer;
+                }
+                else c=null;
+            }
+            i++;
+            return c;
     }
-    
+   
 }
     
 
