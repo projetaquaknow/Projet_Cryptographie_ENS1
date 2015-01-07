@@ -7,12 +7,15 @@ package Signature;
 
 import GUI.SignatureGUI;
 import Test_Cryptographie.CA.KStore;
+import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -29,6 +32,7 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import static org.bouncycastle.cms.RecipientId.password;
+import verification.Verification;
 
 /**
  * Classe qui permet de vérifier si le données introduites par l'utilisateur
@@ -116,6 +120,11 @@ public class Searcher {
             return true;
         }
         return false;
+    }
+    
+    public boolean checkSignature(File file, PublicKey publicKey, String tagB64) throws GeneralSecurityException, IOException {
+        Verification verifier = new Verification("SHA1withRSA");
+        return verifier.verifyFile(file, publicKey, tagB64);
     }
     
     /**
