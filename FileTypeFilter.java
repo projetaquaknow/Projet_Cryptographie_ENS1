@@ -1,10 +1,10 @@
-/*
+/**
  * FileTypeFilter.java
  *
- * Version mise à jour le 21 Décembre 2014
+ * Version mise a jour le 9 Janvier 2015
  * 
- * @author Maithili Vinayagamoorthi
- * @version 1.1
+ * @author  Maithili Vinayagamoorthi
+ * @version 1.0
  */
 
 package GUI;
@@ -19,50 +19,50 @@ import javax.swing.filechooser.FileFilter;
  * de leur extension.
  */
 public class FileTypeFilter extends FileFilter {
-
-	private final String extension;
-	private final String description;
+    
+    private final String extension;
+    private final String description;
 	
-	/**
-	 * Constructeur de la classe FileTypeFilter
-         * @param extension
-         * @param description
-	 */
-	public FileTypeFilter(String extension, String description) 
-	{
-	    this.extension = extension;
-	    this.description = description;
-	}
+    /**
+     * Constructeur de la classe FileTypeFilter
+     * @author  Maithili Vinayagamoorthi
+     * @param   extension
+     * @param   description
+    */
+    public FileTypeFilter(String extension, String description) 
+    {
+        this.extension = extension;
+        this.description = description;
+    }
 	
-	/**
-	 * Fonction qui filtre les fichiers en fonction
-	 * de leur extension
-	 * 
-	 * @param file      Fichier
-	 * @author          Maithili Vinayagamoorthi
-         * @return 
-	 * 
-	 */
-	@Override
-	public boolean accept(File file) 
-	{
-	     if (file.isDirectory()) 
-	     {
-	         return true;
-	     }
-	     
-	     return file.getName().toLowerCase().endsWith(extension);
-	}
+    /**
+     * Fonction qui filtre les fichiers en fonction
+     * de leur extension
+     * 
+     * @param    file Fichier
+     * @author   Maithili Vinayagamoorthi
+     * @return   Boolean : Filtration du fichier
+     * 
+    */
+    @Override
+    public boolean accept(File file) 
+    {
+        if (file.isDirectory()) 
+        {
+            return true;
+        }	     
+	    return file.getName().toLowerCase().endsWith(extension);
+    }
 	
-	/**
-	 * Donne l'extension du fichier s�l�ctionn�
-	 * 
-	 * @author   Maithili Vinayagamoorthi  
-         * @return   String: Description du fichier
-	 */
-        @Override
-	public String getDescription() 
-	{
-	     return description + String.format(" (*%s)", extension);
-	}
+    /**
+     * Donne l'extension du fichier selectionne
+     * 
+     * @author   Maithili Vinayagamoorthi  
+     * @return   String : Description du fichier
+    */
+    @Override
+    public String getDescription() 
+    {
+        return description + String.format(" (*%s)", extension);
+    }
 }
