@@ -1,12 +1,19 @@
+/**
+ * SignerTest.java
+ * 
+ * Version mise à jour le 9 Janvier 2015
+ * 
+ * @author David Carmona-Moreno
+ * @author Patrick Guichet
+ * @version 1.0
+ */
+
 package Signature;
 
-import Signature.Searcher;
 import Signature.Signer.PairGenerator;
 import Test_Cryptographie.Extract;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -18,8 +25,6 @@ import javax.security.auth.x500.X500Principal;
 
 /**
  * Classe de démonstration de Signer
- * @author David Carmona-Moreno
- * @author Patrick Guichet
  */
 public class SignerTest {
     
@@ -71,7 +76,7 @@ public class SignerTest {
             System.out.printf("Tag signature : %s\n", tag);
             
             // Ecriture dans un fichier de la signature obtenue
-            signer.WriteSignature(tag);
+            Signer.WriteSignature(tag);
            
             // Vérification de la signature de ce même fichier
             System.out.printf(
@@ -80,11 +85,9 @@ public class SignerTest {
                     tag));
             
             // Copier le DN dans le fichier signature
-            extract.WriteDN(mydn);
+            Extract.WriteDN(mydn);
             
-        } catch (IOException ex) {
-            Logger.getLogger(SignerTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GeneralSecurityException ex) {
+        } catch (IOException | GeneralSecurityException ex) {
             Logger.getLogger(SignerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

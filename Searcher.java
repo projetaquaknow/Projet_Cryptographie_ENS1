@@ -1,51 +1,37 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Searcher.java
+ * 
+ * Version mise à jour le 9 Janvier 2015
+ * 
+ * @author David Carmona-Moreno
+ * @author Cathie Prigent
+ * @version 1.0
  */
+
 package Signature;
 
-import GUI.SignatureGUI;
-import Test_Cryptographie.CA.KStore;
-import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import static org.bouncycastle.cms.RecipientId.password;
-import verification.Verification;
 
 /**
  * Classe qui permet de vérifier si le données introduites par l'utilisateur
  * existent dans le Keystore
- * @author David Carmona-Moreno
  */
 public class Searcher {
-    
-    // Le prénom et nom de l'utilisateur
-    private String user_name;
-    
-    // Le mot de passe de l'utilisateur
-    private String user_password;
     
     // L'alias associé à l'entrée de type clé privée
     private String alias_member;
@@ -58,31 +44,35 @@ public class Searcher {
     
     /**
      * Constructeur de la classe Searcher
-     * @param surname Le nom de l'utilisateur
-     * @param name Le prénom de l'utilisateur
-     * @param password Le mot de passe de l'utilisateur
+     * @throws java.security.KeyStoreException si aucun provider ne peut d'implémentation ou qu'il n'a pas été initialisé
+     * @throws java.security.NoSuchAlgorithmException si l'algorithme indiqué n'est pas reconnu
+     * @throws java.security.cert.CertificateException si le certificat n'a pas pu être chargé
+     * @throws java.io.IOException si une erreur d'entrée-sortie se produit, par exemple sérialisation du keystore corrompue
      */
     public Searcher() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException{
         
         // Instance du Keystore
         kstore=new Test_Cryptographie.CA.KStore();
-        
-        // Les données membres sont les données introduites par l'utilisateur
-        //this.user_name=name;
-        //this.user_password=password;
     }
     
     /**
      * Méthode qui permet de vérifier que les données introduites par 
      * l'utilisateur existent dans le Keystore
-     * @return 
+     * @param name Le nom de l'utilisation (champ CN du DN)
+     * @param password Le mot de passe qui protège la clé privée
+     * @return True si les informations concordent avec celle du keystore, sinon False
+     * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au niveau du constructeur du Keystore
+     * @throws java.security.NoSuchAlgorithmException si l'algorithme indiqué n'est pas reconnu
+     * @throws java.security.cert.CertificateException si le certificat n'a pas pu être chargé
+     * @throws java.io.IOException 
+     * @throws java.security.UnrecoverableKeyException Si la clé ne peut être récupérée, si le mot de passe fourni est erronné, par exemple
      */
     public boolean verify(String name,String password) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException{
         
         if((checkUserName(name)&&checkPassword(name,password))==true){
             return true;
         }else{
-        return false;
+            return false;
         }
         
     }
@@ -90,7 +80,11 @@ public class Searcher {
     /**
      * Méthode qui permet de vérifier que le mot de passe de l'utilisateur
      * est correct.
-     * @param pass Mot de pass de l'entrée
+     * @param username Le nom de l'utilisation auquel est associé le mot de passe
+     * @param pass Mot de passe de l'entrée
+     * @return True si le mot de passe saisi est correct, sinon False
+     * @throws java.security.KeyStoreException 
+     * @throws java.security.cert.CertificateEncodingException
      */
     public boolean checkPassword(String username,String pass) throws KeyStoreException, CertificateEncodingException  {
         
@@ -122,22 +116,18 @@ public class Searcher {
         return false;
     }
     
-    public boolean checkSignature(File file, PublicKey publicKey, String tagB64) throws GeneralSecurityException, IOException {
-        Verification verifier = new Verification("SHA1withRSA");
-        return verifier.verifyFile(file, publicKey, tagB64);
-    }
-    
     /**
-     * Méthode qui permet de récupérer l'alias de l'entrée de type clé privée
-     * en fonction du mot de passe introduit par l'utilisateur.
+     * Fixe l'alias associé au certificat en tant que donnée membre
+     * @param myalias L'alias associé au certificat
+     * @return La donnée membre
      */
     public String setAlias(String myalias){
         return this.alias_member=myalias;
     }
     
     /**
-     * Méthode qui permet de récupérer l'alias de l'entrée de type clé privée
-     * en fonction du mot de passe introduit par l'utilisateur
+     * Renvoie la donnée membre alias de la classe
+     * @return L'alias 
      */
     public String getAlias(){
         return alias_member;
@@ -147,6 +137,11 @@ public class Searcher {
      * Méthode qui permet de vérifier que l'username inséré par l'utilisateur
      * existe bien dans le Keystore
      * @param username Le nom et prénom de d'utilisateur
+     * @return True si l'useername existe dans le keystore, False sinon
+     * @throws java.security.KeyStoreException si aucun provider ne peut d'implémentation ou qu'il n'a pas été initialisé
+     * @throws java.security.NoSuchAlgorithmException si l'algorithme indiqué n'est pas reconnu
+     * @throws java.security.cert.CertificateException si le certificat n'a pas pu être chargé
+     * @throws java.io.IOException si une erreur d'entrée-sortie se produit, par exemple sérialisation du keystore corrompue
      */
     public boolean checkUserName(String username) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException{
         
@@ -189,7 +184,9 @@ public class Searcher {
     }
     
     /**
-     * Méthode qui permet de récupérer l'alias de l'entrée de type certificat
+     * Méthode qui permet d'associer l'alias à l'entrée de type certificat
+     * @param certificateAlias Le nom à associer au certificat
+     * @return L'alias de l'entrée de type certificat
      */
     public String setCertificateAlias(String certificateAlias){
         return this.alias_member_certificate=certificateAlias;
@@ -197,6 +194,7 @@ public class Searcher {
     
     /**
      * Méthode qui permet de récupérer l'alias de l'entrée de type certificat
+     * @return L'alias associé à l'entrée de type certificat
      */
     public String getCertificateAlias(){
         return alias_member_certificate;
@@ -206,6 +204,8 @@ public class Searcher {
      * @param cert Le certificat dont il faut extraire le CN
      * @param alias L'identificateur de l'entrée du Keystore dont on veut récupérer le CN
      * @return Le common name asscocié à l'entrée de type certificat
+     * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
+     * @throws java.security.cert.CertificateEncodingException Si l'encodage du certificat échoue
      */
     public String ExtractCNCert(String alias,X509Certificate cert) throws KeyStoreException, CertificateEncodingException {
         
@@ -228,6 +228,7 @@ public class Searcher {
      * Méthode qui permet de parcourir toutes les entrées d'un Keystore  de type
      * Certificat et les insérer dans une liste.
      * @return La Liste des alias
+     * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
      */
     public List<X509Certificate> loop() throws KeyStoreException{
         
@@ -259,8 +260,9 @@ public class Searcher {
     }
     
     /**
-     * Méthode qui sert à récupérerles alias
+     * Méthode qui sert à récupérer les alias
      * @return La liste des alias
+     * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
      */
     public List<String> loopAliasCertificate() throws KeyStoreException{
         
@@ -295,6 +297,7 @@ public class Searcher {
      * Méthode qui permet de parcourir tous les alias du Keystore
      * et de les sauvegarder dans une liste
      * @return La liste des alias dont l'entrée est une clé de type privée
+     * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
      */
     public List<String> loopAliasKey() throws KeyStoreException{
         
@@ -317,28 +320,5 @@ public class Searcher {
 		}
         }
         return alias_list_Key;                   
-    }
-    
-    
-    /**
-     * 
-     * @param args
-     * @throws KeyStoreException
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateException
-     * @throws IOException 
-     */
-     
- /*   public static void main(String[] args) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException{
-         Searcher search=new Searcher("David Carmona-Moreno","qwerty");
-        //String cn=search.ExtractCNCert("key4");
-        // System.out.println(cn);
-         boolean c=search.verify();
-         boolean b=search.checkUserName("Patrick Guichet");
-        //System.out.println(b);
-         //System.out.println(c);
-         boolean p=search.checkPassword("gff","guichet");
-         System.out.println(c);
-    }*/
-            
+    }    
 }

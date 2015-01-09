@@ -1,45 +1,38 @@
+/**
+ * SignerTest.java
+ * 
+ * Version mise à jour le 9 Janvier 2015
+ * 
+ * @author David Carmona-Moreno
+ * @author Maithili Vinayagaoorthi
+ * @author Patrick Guichet
+ * @version 1.0
+ */
+
 package Signature;
 
-import Test_Cryptographie.CA;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.Signature;
-import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.ECGenParameterSpec;
-import java.util.Enumeration;
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * La classe Signer permet de signer
  * des documents avec l'algorithme RSA
- * (Elliptic Curve Digital Signature Algorithm)
- * @author David Carmona-Moreno
- * @author Patrick Guichet
  */
 public class Signer {
     
@@ -83,7 +76,7 @@ public class Signer {
     }
     
     // L'objet chargé du calcul de la signature
-    private Signature signer;
+    private final Signature signer;
     
      /**
      * Constructeur de la classe Signer.
@@ -139,7 +132,7 @@ public class Signer {
         String sgfile=signFile(new File(fileName), privateKey);
         
         // Appel à la méthode permettant d'écrire dans un fichier la signature obtenue
-        this.WriteSignature(sgfile);
+        Signer.WriteSignature(sgfile);
         
         return signFile(new File(fileName), privateKey);
     }
@@ -175,7 +168,7 @@ public class Signer {
 
     /**
      * Vérification de la signature d'un fichier
-     * @param file Le nom du fichier à vérifier
+     * @param fileName Le nom du fichier à vérifier
      * @param publicKey La clé publique initialisant la vérification
      * @param tagB64 L'encodage en Base64 de la signature à vérifier
      * @return <code>true</code> Si la signature est correcte et <code>false</code> sinon
@@ -188,14 +181,13 @@ public class Signer {
     }
     
     /**
-    * Lecture du fichier contenant le chemin du fichier
-    * @param myfile Le nom du fichier contenant le chemin du fichier
+    * Lecture du fichier contenant le chemin du fichier que l'on souhaite signer
+    * @param myfile Le nom du fichier contenant le chemin du fichier cible
+    * @return Le chemin vers le fichier à signer
+    * @throws java.io.FileNotFoundException Si le fichier n'existe pas
     */
     public static String Read_Signer(String myfile) throws FileNotFoundException, IOException{
-       
-        // Flux d'entrée ds données contenues dans un fichier
-        FileInputStream fileinput=new FileInputStream(new File(myfile));
-             
+        
         // Buffer de lecture
         BufferedReader in=new BufferedReader(new FileReader(myfile));
              
@@ -211,6 +203,8 @@ public class Signer {
      * On génère un fichier texte(.txt) contenant la signature 
      * du fichier choisi par l'utilisateur
      * @param sig La signature du fichier
+     * @throws java.io.FileNotFoundException Si le fichier n'existe pas
+     * @throws java.io.UnsupportedEncodingException Si l'encodage des caractères n'est pas supporté
      */
     public static void WriteSignature(String sig) throws FileNotFoundException, UnsupportedEncodingException, IOException{
         
