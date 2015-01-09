@@ -1,9 +1,22 @@
+/**
+ * CA.java
+ * 
+ * Version mise à jour le 9 Janvier 2015
+ * 
+ * @author Lepagnot Julien
+ * @author Cathie Prigent
+ * @author Maithili Vinayagamoorthi
+ * @author David Carmona-Moreno
+ * @version 1.0
+ */
+
 package Test_Cryptographie;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +48,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Enumeration;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.cert.X509ExtensionUtils;
@@ -51,10 +65,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * Une classe implémentant une autorité de certification
- * 
- * @author Cathie Prigent
- * @author Maithilie Vinayagamoorthi
- * @author David Carmona-Moreno
  */
 public class CA {
      
@@ -112,11 +122,11 @@ public class CA {
     private PrivateKey caPk;
    
     /**
-         * Construction d'une instance de la classe
-         * @param passwd Le mot de passe protégeant le keystore du CA
-         * @throws GeneralSecurityException si la fabrication/récupération du certificat du CA échoue
-         * @throws IOException si une erreur d'entrée-sortie se produit,
-         * par exemple sérialisation du keystore corrompue
+    * Construction d'une instance de la classe
+    * @param passwd Le mot de passe protégeant le keystore du CA
+    * @throws GeneralSecurityException si la fabrication/récupération du certificat du CA échoue
+    * @throws IOException si une erreur d'entrée-sortie se produit, par exemple sérialisation du keystore corrompue
+    * @throws org.bouncycastle.operator.OperatorCreationException 
      */
     public CA(char[] passwd) throws GeneralSecurityException, IOException, OperatorCreationException {
         
@@ -142,8 +152,7 @@ public class CA {
          * @param passwd le mot de passe qui protège le keystore
          * @param caDir le fichier où sera sérialisé le keystore
          * @throws GeneralSecurityException si la fabrication/récupération du certificat du CA échoue
-         * @throws IOExceptionsi une erreur d'entrée-sortie se produit, 
-         * par exemple sérialisation du keystore corrompue
+         * @throws IOException si une erreur d'entrée-sortie se produit, par exemple sérialisation du keystore corrompue
      */
     private void installCA(KeyStore ks, char[] passwd, File caDir)
         throws GeneralSecurityException, IOException, OperatorCreationException {
@@ -153,11 +162,6 @@ public class CA {
         KeyPair caKp = kpg.generateKeyPair();
         this.caPk = caKp.getPrivate();
         PublicKey publicKey=caKp.getPublic();
-        
-        // le numéro de série de ce certificat
-        // certGen.setSerialNumber(BigInteger.ONE);
-        // SecureRandom random = SecureRandom.getInstance("SHA1_WITH_RSA_OID");
-        // BigInteger serialNumber = BigInteger.valueOf(Math.abs(random.nextInt()));
         
         // le nom de l'émetteur 
         X500Name caDn = new X500Name(DN);
@@ -226,17 +230,19 @@ public class CA {
     public static class KStore {
         
         // Le keystore de l'instance	
-        private KeyStore kstore;
+        public KeyStore kstore;
    
         // Mot de passe du Keystore
         private char[] kstorepwd;
      
         /**
          * Constructeur de la classe Kstore
-         * @param algoType    Le type du Keystore
-         * @param passwd      Le mot de passe du Keystore
+         * @throws java.security.KeyStoreException si aucun provider ne peut d'implémentation ou qu'il n'a pas été initialisé
+         * @throws java.security.NoSuchAlgorithmException si l'algorithme indiqué n'est pas reconnu
+         * @throws java.security.cert.CertificateException si le certificat n'a pas pu être chargé
+         * @throws java.io.IOException si une erreur d'entrée-sortie se produit, par exemple sérialisation du keystore corrompue
          */
-        KStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+        public KStore() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     	  
     	    // Construction d'une instance d'un keystore de type type
             kstore = KeyStore.getInstance("JCEKS");
@@ -257,6 +263,8 @@ public class CA {
          * protégeant avec le mot de passe passwd.
          * @param file Le fichier dans lequel sauvegarder le keystore de l'instance.
          * @param passwd Le mot de passe protégeant le fichier créé.
+         * @throws java.security.GeneralSecurityException si le keystore est corrompu
+         * @throws java.io.IOException si une erreur d'entrée-sortie se produit, par exemple sérialisation du keystore corrompue
          */
         public void save(String file, char[] passwd)
             throws GeneralSecurityException, IOException {
@@ -265,14 +273,14 @@ public class CA {
             try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             kstore.store(os, passwd);
             }
-        
         }
         
         /**
          * Méthode qui permet d'ajouter une entrée au Keystore généré
-         * @param alias
-         * @param entry
-         * @param protParam 
+         * @param alias Alias qui sera associé à l'entrée dans le Keystore
+         * @param entry L'objet (clé privée, certificat...) que l'on souhaite insérée
+         * @param protParam Détermine avec quelle type de protection est protégée l'entrée
+         * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
          */
         public void enterpk(String alias,KeyStore.Entry entry,KeyStore.ProtectionParameter protParam)
                 throws KeyStoreException
@@ -282,9 +290,9 @@ public class CA {
         
         /**
          * Méthode qui permet d'ajouter une entrée de type CertificateEntry dans le Keystore généré
-         * @param alias L'alias 
+         * @param alias L'alias associé au certificat
          * @param cert  Le certificat 
-         * @throws KeyStoreException 
+         * @throws KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
          */
         public void entercert(String alias,Certificate cert)throws KeyStoreException{
             kstore.setCertificateEntry(alias, cert);
@@ -293,10 +301,10 @@ public class CA {
         /**
          * Méthode qui permet de savoir si l'entrée identifiée par l'alias est de type clé privée
          * @param alias L'identificateur de l'entrée
-         * @return Si l'entrée est de type clé privée alors la méthode envoi true sinon false
+         * @return Si l'entrée est de type clé privée alors la méthode renvoie true sinon false
          * @throws KeyStoreException  On lance cette exception lorsqu'il y a eu une erreur au nievau du constructeur du Keystore
          */
-        public final boolean isPrivateKeyEntry(String alias) throws KeyStoreException{
+        public final boolean isPrivateKeyEntry(String alias) throws KeyStoreException {
             return kstore.isKeyEntry(alias);
         }
         
@@ -304,26 +312,55 @@ public class CA {
          * Méthode qui permet de récupérer la clé privée d'une entrée de type PrivateKey
          * @param alias L'identificateur de l'entrée
          * @param entrypasswd Le mot de passe de l'entrée
+         * @return La clé privée associée à l'alias et au mot de passe
+         * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au niveau du constructeur du Keystore
+         * @throws java.security.NoSuchAlgorithmException Si l'algorithme indiqué n'est pas reconnu
+         * @throws java.security.UnrecoverableKeyException Si la clé ne peut être récupérée, si le mot de passe fourni est erronné, par exemple
          */
         public final Key getPrivateKey(String alias,char[] entrypasswd) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException{
             return kstore.getKey(alias, entrypasswd);
-            
         }
         
         /**
          * Méthode qui permet de savoir si l'entrée identifiée par l'alias est une entrée de type certificat
          * @param alias L'identificateur de l'entrée
+         * @return Le certificat associé à l'alias
+         * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au niveau du constructeur du Keystore
          */
         public final boolean isCertEntry(String alias) throws KeyStoreException{
             return kstore.isCertificateEntry(alias);
         }
         
         /**
-         * Méthode qui permet d'obtenir le certificat associé à l'entrée de type Certificat
+         * Méthode qui permet d'obtenir le certificat associé à l'alias de l'entrée de type Certificat
          * @param alias L'identificateur de l'entrée
+         * @return Le Certificat que l'on souhaite récupérer
+         * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au niveau du constructeur du Keystore
          */
         public final X509Certificate getCert(String alias) throws KeyStoreException{
             return (X509Certificate) kstore.getCertificate(alias);
+        }
+        
+        /**
+         * Méthode qui permet de charger le Keystore
+         * @throws java.io.FileNotFoundException
+         * @throws java.security.NoSuchAlgorithmException si l'algorithme indiqué n'est pas reconnu
+         * @throws java.security.cert.CertificateException si le certificat n'a pas pu être chargé
+         */
+        public void loadKeystore () throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException {
+            
+            InputStream is = new BufferedInputStream(new FileInputStream(new File("kstore.ks")));
+            kstore.load(is,"azerty".toCharArray());
+            
+        }
+        
+        /**
+         * Méthode qui permet de récupérer une liste de tous les alias d'un Keystore
+         * @return La liste des alias contenus dans le Keystore
+         * @throws java.security.KeyStoreException On lance cette exception lorsqu'il y a eu une erreur au niveau du constructeur du Keystore
+         */
+        public final Enumeration<String> aliasList() throws KeyStoreException{
+            return kstore.aliases();
         }
     }
     
@@ -402,7 +439,7 @@ public class CA {
     /**
     * Exportation du certificat du CA en DER encodé base64
     * @param fileName le nom du fichier où exporter le certificat
-    * @param le certificat à exporter
+    * @param cert le certificat à exporter
     * @throws GeneralSecurityException si l'encodage DER échoue
     * @throws IOException si l'exportation échoue
     */
@@ -437,7 +474,7 @@ public class CA {
             PublicKey pub=caKp.getPublic();
             
             X509Certificate usrCert = ca.generateUserCertificate(
-                    "CN=Charles Paris, OU=FST, O=UHA, L=Mulhouse, ST=68093, C=FR",
+                    "CN=Julien Lepagnot, OU=FST, O=UHA, L=Mulhouse, ST=68093, C=FR",
                     pub);
             
             // Exportation du certificat du serveur
@@ -445,33 +482,19 @@ public class CA {
             
             // Exportation du certificat du CA
             CA.exportCertificate("ca.cer", ca.caCert);
-            
-            // Création d'un chemin de certification pour srvCert
-            /*CertificateFactory factory = CertificateFactory.getInstance("X509");
-            List list = new ArrayList();
-            list.add(usrCert);
-            CertPath cp = factory.generateCertPath(list);
-            byte[] encoded = cp.getEncoded("PKCS7");
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream("srv.p7b"))) {
-                out.write(encoded);*/
-            //}
-            
+          
             // Générer une instance de PrivateKeyEntry contenant la clé privée
             PrivateKeyEntry priventry=new PrivateKeyEntry(priv,new Certificate[]{usrCert});
             
             // La clé privée est associée à un alias et est protégée par un mot de passe
-	    mystore.enterpk("key3", priventry, new KeyStore.PasswordProtection("charles".toCharArray()));
+	    mystore.enterpk("key3", priventry, new KeyStore.PasswordProtection("julien".toCharArray()));
             
             // On associe un certificat à l'alias
             mystore.entercert("key4", usrCert);
             
             //Sauver le Keystore
             mystore.save("kstore.ks","azerty".toCharArray());
-            
-            /* Vérification de ce chemin de certification en utilisant caCert
-            PKIXValidator pkiV = new PKIXValidator(new String[]{"ca.cer"});
-            pk = pkiV.validate("srv.p7b", "PKCS7");*/
-            
+
             // Affichage de la clé publique du serveur
             System.out.println(pub);
         } catch (GeneralSecurityException | IOException | OperatorCreationException ex) {
